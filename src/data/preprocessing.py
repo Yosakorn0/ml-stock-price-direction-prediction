@@ -12,7 +12,7 @@ class Preprocessor:
         self.analyzer = SentimentAnalyzer()
         self.tech_features = TechnicalFeatures()
 
-    def process_asset(self, symbol):
+    def process_asset(self, symbol, include_macro=False):
         """Full pipeline for a single asset."""
         print(f"\nProcessing all features for {symbol}...")
         
@@ -40,23 +40,23 @@ class Preprocessor:
         # 4. Create Target (1 if Price goes up tomorrow, else 0)
         df['Target'] = (df['Close'].shift(-1) > df['Close']).astype(int)
         
+        # 5. Optional Macro Data (Feature Consistency)
+        if include_macro:
+            macro_data = self.ingestor.fetch_macro_data()
+            macro_daily = macro_data.resample('D').ffill()
+            df = df.join(macro_daily, how='left')
+            df = df.fillna(method='ffill')
+            
         return df.dropna()
 
     def prepare_all_data(self):
         """Prepare data for all symbols and save."""
         os.makedirs("data/processed", exist_ok=True)
         
-        # Fetch shared macro data once
-        macro_data = self.ingestor.fetch_macro_data()
-        macro_daily = macro_data.resample('D').pad()
-        
         combined_data = {}
         for symbol in self.symbols:
-            df = self.process_asset(symbol)
-            
-            # Merge with macro data
-            df = df.join(macro_daily, how='left')
-            df = df.fillna(method='ffill')
+            # Join macro data for each symbol to ensure parity
+            df = self.process_asset(symbol, include_macro=True)
             
             # Save individual symbol data
             clean_symbol = symbol.replace("=F", "_GOLD").replace("-USD", "_BTC")

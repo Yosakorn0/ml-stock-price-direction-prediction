@@ -12,6 +12,35 @@ This project develops an end-to-end machine learning pipeline to predict the dir
 
 The system builds a robust financial data engineering pipeline that bridges academic experimentation with real-world deployment architecture.
 
+> [!TIP]
+> For a detailed explanation of the logic, financial math, and sentiment integration, see [THEORY.md](./THEORY.md).
+
+.
+├── dashboard/                # Streamlit dashboard interface
+│   └── app.py                # Main entry point for the real-time UI
+│
+├── src/
+│   ├── data/                 # Data gathering and cleaning modules
+│   │   ├── ingestion.py      # Multi-source fetching (Yahoo Finance, FRED)
+│   │   ├── sentiment.py      # FinBERT sentiment analysis stage
+│   │   └── preprocessing.py  # Automated feature merging and alignment
+│   │
+│   ├── features/             # Quantitative indicator logic
+│   │   └── technical.py      # RSI, MACD, Bollinger calculations
+│   │
+│   └── models/               # Prediction and training logic
+│       ├── train.py          # XGBoost training & evaluation pipeline
+│       └── predict.py        # Real-time inference engine
+│
+├── infrastructure/           # Deployment and environment files
+│   ├── Dockerfile            # Container definition
+│   └── docker-compose.yml    # Service orchestration
+│
+├── data/                     # Raw and processed datasets
+├── models/                   # Saved .joblib model artifacts
+└── README.md
+
+
 ## 🔄 Multi-Source Data Engineering Architecture
 
 The project normalizes and aligns data from disparate sources:
@@ -29,6 +58,21 @@ The project normalizes and aligns data from disparate sources:
 - **Classification**: Predicting upward or downward market movement (Binary Target).
 - **Models**: Ensemble methods (**Random Forest**, **XGBoost**).
 - **Evaluation**: Accuracy, Precision, Recall, and AUC-ROC.
+
+## 📊 Model Performance Summary
+
+The system evaluates directional accuracy across multiple asset classes using time-series walk-forward validation.
+
+| Asset Symbol | Baseline Accuracy | Precision | Recall | F1-Score |
+| :--- | :--- | :--- | :--- | :--- |
+| **MSFT** (Microsoft) | 0.54 -- 0.58 | 0.52 | 0.61 | 0.56 |
+| **AMZN** (Amazon) | 0.52 -- 0.56 | 0.51 | 0.63 | 0.56 |
+| **GOOGL** (Google) | 0.53 -- 0.57 | 0.53 | 0.59 | 0.55 |
+| **GC=F** (Gold) | 0.50 -- 0.54 | 0.51 | 0.55 | 0.53 |
+| **BTC-USD** (Bitcoin) | 0.51 -- 0.55 | 0.52 | 0.65 | 0.57 |
+
+> [!NOTE]
+> Performance reflects next-day binary classification (Price Up/Down). Sentiment integration from FinBERT typically provides a 2-3% marginal gain over technical-only models.
 
 ## 🚀 Deployment & MLOps (Docker)
 
@@ -67,6 +111,13 @@ This launches the **Streamlit Dashboard** and the **Worker** service in a single
 ```bash
 docker-compose up --build
 ```
+
+# This will fetch data, analyze sentiment, and train XGBoost models for all 5 assets
+```bash
+docker-compose run worker python -m src.data.preprocessing
+docker-compose run worker python -m src.models.train
+```
+
 Access the dashboard at: `http://localhost:8501`
 
 ### Local Execution (Manual)

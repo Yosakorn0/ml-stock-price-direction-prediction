@@ -1,6 +1,6 @@
 yfinance
-pandas
-pandas-datareader
+pandas==2.1.4
+pandas-datareader==0.10.0
 numpy
 finnhub-python
 requests
@@ -8,6 +8,7 @@ python-dotenv
 plotly
 transformers
 torch
+torchvision
 xgboost
 scikit-learn
 joblib

@@ -11,9 +11,8 @@ class Predictor:
 
     def get_latest_data(self, symbol):
         """Fetch and process the most recent data for a symbol."""
-        # For the latest prediction, we need the most recent features
-        # preprocessing.py handles fetching and indicator calculation
-        df = self.preprocessor.process_asset(symbol)
+        # For the latest prediction, we need the same features used in training (macro included)
+        df = self.preprocessor.process_asset(symbol, include_macro=True)
         return df.tail(1)
 
     def predict_direction(self, symbol):

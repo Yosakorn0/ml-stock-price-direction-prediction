@@ -8,8 +8,8 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
-    software-properties-common \
     git \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install
@@ -23,4 +23,4 @@ COPY . .
 EXPOSE 8501
 
 # Command to run the dashboard by default
-ENTRYPOINT ["streamlit", "run", "dashboard/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "dashboard/app.py", "--server.port=8501", "--server.address=0.0.0.0"]

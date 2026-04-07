@@ -7,6 +7,8 @@ services:
       - "8501:8501"
     env_file:
       - .env.local
+    environment:
+      - PYTHONPATH=/app
     volumes:
       - .:/app
     command: streamlit run dashboard/app.py --server.port=8501 --server.address=0.0.0.0
@@ -15,6 +17,8 @@ services:
     build: .
     env_file:
       - .env.local
+    environment:
+      - PYTHONPATH=/app
     volumes:
       - .:/app
     # The worker can be used to manually run the training/ingestion scripts

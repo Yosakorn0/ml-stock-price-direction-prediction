@@ -46,7 +46,7 @@ class DataIngestion:
     def merge_data(self, market_data, macro_data):
         """Merge market and macro data, aligning on date."""
         # Note: FRED data is often monthly/weekly. We forward fill to daily.
-        macro_daily = macro_data.resample('D').pad()
+        macro_daily = macro_data.resample('D').ffill()
         
         # If market_data is MultiIndex (multiple symbols), we might want to merge per symbol
         # or just return both for now.
