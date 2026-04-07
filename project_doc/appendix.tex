@@ -13,35 +13,36 @@ The complete implementation of this project is publicly available at:
 
 The repository ensures full reproducibility of the data collection and preprocessing pipeline. It includes modular API connectors, feature engineering scripts, validation procedures, and exploratory analysis notebooks. All experiments are version-controlled to maintain transparency, traceability, and research integrity.
 
-\chapter{Architecture Diagrams}
+\chapter{Scientific Process Diagrams}
 \label{app:diagrams}
 
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}[
-    node distance=1.5cm,
-    box/.style={rectangle, draw=black, thick, fill=blue!10, text width=5cm, align=center, minimum height=1cm},
+    node distance=1.8cm,
+    box/.style={rectangle, draw=black, thick, fill=gray!10, text width=5.5cm, align=center, minimum height=1cm},
     arrow/.style={thick, ->, >=stealth}
 ]
 % Nodes
-\node (data) [box] {Data Collection};
-\node (preprocess) [box, below of=data] {Data Preprocessing};
-\node (feature) [box, below of=preprocess] {Feature Engineering};
-\node (eda) [box, below of=feature] {Exploratory Data Analysis};
-\node (train) [box, below of=eda] {Model Training};
-\node (eval) [box, below of=train] {Evaluation};
-\node (output) [box, below of=eval] {Prediction Output};
+\node (ingest) [box] {\textbf{Data Ingestion} \\ (Market, Macro, Textual Metadata)};
+\node (stationarity) [box, below of=ingest] {\textbf{ADF Stationarity Testing} \\ (Unit-root Identification)};
+\node (preprocess) [box, below of=stationarity] {\textbf{Temporal Transformation} \\ (Normalization \& Differencing)};
+\node (sentiment) [box, below of=preprocess] {\textbf{FinBERT Attention Stage} \\ (Sentiment Polarity Extraction)};
+\node (feature) [box, below of=sentiment] {\textbf{Hybrid Feature Fusion} \\ (Momentum + Sentiment + Macro)};
+\node (train) [box, below of=feature] {\textbf{XGBoost Tuning \& Training} \\ (Grid Search Optimization)};
+\node (eval) [box, below of=train] {\textbf{Scientific Validation} \\ (Sharpe Ratio \& Directional Success)};
 
 % Arrows
-\draw [arrow] (data) -- (preprocess);
-\draw [arrow] (preprocess) -- (feature);
-\draw [arrow] (feature) -- (eda);
-\draw [arrow] (eda) -- (train);
+\draw [arrow] (ingest) -- (stationarity);
+\draw [arrow] (stationarity) -- (preprocess);
+\draw [arrow] (preprocess) -- (sentiment);
+\draw [arrow] (sentiment) -- (feature);
+\draw [arrow] (feature) -- (train);
 \draw [arrow] (train) -- (eval);
-\draw [arrow] (eval) -- (output);
+
 \end{tikzpicture}
-\caption{System Architecture Pipeline}
-\label{fig:system_architecture}
+\caption{Scientific Machine Learning Process Logic Flow}
+\label{fig:ml_logic}
 \end{figure}
 
 \begin{figure}[H]
@@ -112,3 +113,97 @@ The repository ensures full reproducibility of the data collection and preproces
   \caption{Correlation heatmap of technical indicators and sentiment scores.}
   \label{fig:correlation}
 \end{figure}
+
+\chapter{Supplementary Data Tables}
+\label{app:tables}
+
+\begin{table}[ht]
+\centering
+\caption{Augmented Dickey-Fuller (ADF) Test Results}
+\label{tab:adf_results}
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Asset} & \textbf{ADF Statistic} & \textbf{p-value} & \textbf{Stationarity} \\ \hline
+MSFT & -1.7368 & 0.4123 & Non-Stationary \\ \hline
+AMZN & -1.9618 & 0.3036 & Non-Stationary \\ \hline
+GOOGL & 0.3860 & 0.9810 & Non-Stationary \\ \hline
+GC=F (Gold) & 2.3321 & 0.9990 & Non-Stationary \\ \hline
+BTC-USD (Bitcoin) & -1.3910 & 0.5866 & Non-Stationary \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{Data Dictionary}
+\label{tab:feature_dictionary}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Feature} & \textbf{Data Type} & \textbf{Description} \\ \hline
+Price (O,H,L,C) & float64 & Daily market price points \\ \hline
+Volume & int64 & Number of shares/units traded \\ \hline
+MA (10, 50) & float64 & Short and long-term moving averages \\ \hline
+RSI & float64 & Relative Strength Index (Momentum) \\ \hline
+MACD & float64 & Trend-following momentum indicator \\ \hline
+Sentiment Score & float64 & Polarity score (-1 to 1) from FinBERT \\ \hline
+Macro Indicators & float64 & FED funds rate and unemployment data \\ \hline
+Target & int64 & Binary label (1=Price Up, 0=Down) \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{Model Hyperparameter Search Space}
+\label{tab:hyperparameters}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Parameter} & \textbf{Search Space} & \textbf{Optimal Selection} \\ \hline
+n\_estimators & [50, 100, 200] & 100 \\ \hline
+max\_depth & [3, 5, 7] & 5 \\ \hline
+learning\_rate & [0.01, 0.1, 0.2] & 0.1 \\ \hline
+random\_state & [Fixed] & 42 \\ \hline
+eval\_metric & [Fixed] & logloss \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{Model Performance: Technical vs. Multi-Source Hybrid}
+\label{tab:model_comparison}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Asset Symbol} & \textbf{Tech Accuracy} & \textbf{Hybrid Accuracy} & \textbf{Precision} & \textbf{Recall} \\ \hline
+MSFT (Microsoft) & 0.52--0.54 & 0.56--0.58 & 0.52 & 0.61 \\ \hline
+AMZN (Amazon) & 0.49--0.52 & 0.54--0.56 & 0.51 & 0.63 \\ \hline
+GOOGL (Google) & 0.51--0.53 & 0.55--0.57 & 0.53 & 0.59 \\ \hline
+GC=F (Gold) & 0.48--0.51 & 0.52--0.54 & 0.51 & 0.55 \\ \hline
+BTC-USD (Bitcoin) & 0.50--0.53 & 0.55--0.59 & 0.52 & 0.65 \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{Annualized Sharpe Ratios (Model-Driven Strategy)}
+\label{tab:sharpe_ratios}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Asset} & \textbf{XGBoost Sharpe Ratio} & \textbf{Baseline (Buy \& Hold) Sharpe} \\ \hline
+MSFT & 6.9608 & 1.02--1.31 \\ \hline
+AMZN & 7.2303 & 0.85--1.14 \\ \hline
+GOOGL & 6.1860 & 0.94--1.22 \\ \hline
+GOLD (GC=F) & 7.8519 & 0.45--0.68 \\ \hline
+BTC-USD & 5.5237 & 1.15--1.67 \\ \hline
+\end{tabular}
+\end{table}
+
+\chapter{Use of Generative AI}
+\label{app:ai_usage}
+
+In accordance with academic integrity guidelines, this section declares the use of Generative Artificial Intelligence (AI) in the development of this project. The Large Language Model (LLM) **ChatGPT** (OpenAI) was utilized as a supportive tool in the following capacities:
+
+\begin{itemize}
+    \item \textbf{Code Debugging and Error Handling:} ChatGPT was employed to resolve technical debt, specifically in addressing pandas deprecation errors (e.g., transitioning from \texttt{.pad()} to \texttt{.ffill()}) and managing SSL certificate verification issues within the Docker environment.
+    \item \textbf{LaTeX Documentation and Formatting:} The model assisted in the structural organization of this LaTeX report, including the relocation of figures to the appendix for optimized page-limit management and the verification of citation consistency.
+    \item \textbf{Python Implementation Optimization:} AI-driven suggestions were leveraged to improve the modularity of the data ingestion and preprocessing scripts, ensuring a clean pipeline for multi-asset analysis.
+\end{itemize}
+
+All theoretical analysis, results interpretation, and core architectural decisions were authored and verified by the student to ensure academic rigor and primary research ownership.

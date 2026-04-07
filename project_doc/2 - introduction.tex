@@ -1,15 +1,19 @@
 \chapter{INTRODUCTION}
 
-This project develops a "Cloud-Native Multi-Source Financial Intelligence System" designed to predict the direction of financial markets by integrating heterogeneous data sources. Moving beyond single-asset analysis, the system implements a generalized machine learning pipeline for a diverse portfolio including equities (MSFT, AMZN, GOOGL), commodities (Gold), and digital assets (Bitcoin). By combining historical price action with macroeconomic variables and automated sentiment analysis using \textbf{ProsusAI/finbert}, the study explores the predictive synergy of technical and fundamental signals in highly volatile environments.
+\section{Background and Literature Review}
+The predictive modeling of financial time-series has evolved from classical statistical models toward complex machine learning ensembles and natural language processing (NLP). Central to this field is the \textbf{Efficient Market Hypothesis (EMH)} \citep{fama1970}, which posits that if markets are 100\% efficient, future prices follow a random walk and are mathematically unpredictable. However, contemporary research in \textbf{Behavioral Finance} \citep{shiller2003} suggests that information asymmetry and irrational investor sentiment create exploitable "noise" in market data.
 
-\section{Statement of the Problem}
-Stock markets are inherently noisy and influenced by a convergence of technical trends, economic shifts, and public sentiment. Identifying reliable predictive signals remains a significant challenge, especially when relying on traditional linear models that fail to capture the non-linear, time-varying dynamics of multi-asset classes. This project addresses the "noise-to-signal" problem by building an end-to-end intelligence system that automates the ingestion and alignment of disparate data sources.
+Past research has explored deep learning architectures, such as **Long Short-Term Memory (LSTM)** networks \citep{hochreiter1997}, to capture temporal dependencies. While theoretically robust for long-term memory, LSTMs often suffer from vanishing gradients and require massive datasets to achieve generalization, which is a significant **con** in the high-noise environment of daily stock prices. In contrast, **Gradient Boosting Decision Trees (GBDT)**, specifically **XGBoost** \citep{chen2016}, offer superior **pros** in handling tabular data and multi-collinearity without the "black-box" risk of over-parameterized neural networks. 
 
-\section{Objectives}
-The primary objectives of this study are:
+Furthermore, the integration of **Transformers** \citep{vaswani2017} has revolutionized financial NLP. While models like BERT provide state-of-the-art accuracy in sentiment extraction, their computational complexity and the need for domain-specific fine-tuning (e.g., FinBERT) remain key challenges for real-time systems. This project explores the synergy between domain-specific sentiment (FinBERT) and robust ensemble methods (XGBoost) to address the limitations of technical-only baseline models.
+
+\section{Problem Statement and Motivation}
+Traditional financial models often rely on internal market variables (Open, High, Low, Close) but fail to anticipate exogenous shocks driven by news headlines or macroeconomic shifts. This study aims to build a scientific data fusion pipeline that bridges the gap between quantitative technical indicators and qualitative textual sentiment. 
+
+\section{Research Objectives}
+To address the research problem, the following primary objectives were established:
 \begin{itemize}
-    \item To design a unified data engineering pipeline for multi-asset market, macro, and sentiment data collection.
-    \item To implement a natural language processing stage using transformer-based models (FinBERT) for automated news sentiment extraction.
-    \item To train and evaluate robust ensemble models (XGBoost, Random Forest) for next-day direction classification.
-    \item To deploy a real-time dashboard and containerized environment for persistent financial intelligence.
+    \item \textbf{Data Integration}: Harmonize heterogeneous market, macro, and sentiment data streams for a multi-asset intelligence system.
+    \item \textbf{Sentiment Quantification}: Utilize FinBERT to transform news headlines into numeric polarity scores to mitigate behavioral information asymmetry.
+    \item \textbf{Predictive Excellence}: Scientifically validate an XGBoost ensemble classifier across five asset classes (Stocks, Gold, Crypto) using rigorous time-series cross-validation.
 \end{itemize}

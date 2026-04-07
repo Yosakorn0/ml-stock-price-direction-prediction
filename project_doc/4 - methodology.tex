@@ -1,30 +1,30 @@
 \chapter{METHODOLOGY}
 
-\section{System Architecture}
-The system architecture follows a modular, unified data pipeline designed for high-frequency daily ingestion and processing. The workflow is orchestrated across four primary stages: ingestion, feature engineering, NLP sentiment analysis, and predictive modeling (see Appendix~\ref{app:diagrams}, Figure~\ref{fig:system_architecture}).
+\section{System Architecture: Machine Learning Pipeline}
+The methodology follows a robust machine learning process logic: Data Ingestion $\rightarrow$ Scientific EDA $\rightarrow$ Feature Engineering $\rightarrow$ Hyperparameter Tuning $\rightarrow$ Inference. This modular workflow ensures that each stage is isolated and verifiable (see Appendix~\ref{app:diagrams}, Figure~\ref{fig:ml_logic}).
 
-\section{Data Preprocessing and EDA}
-The dataset was preprocessed using automated validation scripts to ensure zero-null integrity and consistent data types across heterogeneous sources. Exploratory Data Analysis (EDA) was conducted to identify volatility clusters and trend persistence in the multi-asset portfolio. Due to the diverse nature of the assets (e.g., Bitcoin's 24/7 trading vs. US Stock market hours), forward-filling interpolation was used to align the time-series. Detailed historical trends, return distributions, and correlation heatmaps are provided in Appendix~\ref{app:eda}.
-
-\section{Sentiment Analysis (FinBERT)}
-A critical component of the methodology is the integration of a transformer-based NLP stage. We utilize \textbf{ProsusAI/finbert}, a pre-trained BERT model fine-tuned specifically for financial language. The pipeline fetches the latest news headlines from the Finnhub API for each asset and generates a daily polarity score. This score enables the model to capture the "news-driven" component of price volatility, which technical indicators alone often overlook.
-
-\section{Feature Engineering}
-Technical indicators were calculated per asset to provide momentum and trend-following signals:
+\section{EDA Rationale and Findings}
+Exploratory Data Analysis (EDA) was conducted to scientifically validate the data prior to modeling.
 \begin{itemize}
-    \item \textbf{Momentum:} Relative Strength Index (RSI) and MACD.
-    \item \textbf{Volatility:} Bollinger Bands (Upper/Lower).
-    \item \textbf{Trend:} 10-day and 50-day Moving Averages.
+    \item \textbf{Why:} To identify non-stationarity, kurtosis (fat tails), and volatility clustering, which are prevalent in financial data.
+    \item \textbf{Expectation:} We expected typical market price series to be non-stationary (I(1) process).
+    \item \textbf{Results:} Actual findings from the ADF tests (Table~\ref{tab:adf_results}) confirmed the presence of unit roots. Furthermore, correlation analysis identified that sentiment polarity has a stronger linear relationship with volatility (High-Low spread) than with direct price movement, justifying its use as a regime-filter feature.
 \end{itemize}
 
-\section{Model Implementation}
+\section{Scientific Feature Engineering}
+Features were engineered to transform raw, non-stationary signals into predictive inputs:
+\begin{itemize}
+    \item \textbf{Returns-based Momentum:} Differencing the Close price into percentage returns avoids spurious regressions. RSI and MACD (12, 26, 9) quantify the velocity of these returns.
+    \item \textbf{Volatility Clustering:} Bollinger Bands capture period-specific variance, addressing the "GARCH-like" behavior of asset returns.
+    \item \textbf{Behavioral Signal Fusion:} Daily headlines were converted into a numeric polarity score (-1 to 1) using **FinBERT**. The rationale is based on the transformer's **Self-Attention Mechanism** \citep{vaswani2017}, which weighs contextual tokens (e.g., "federal" and "reserve") to decode sentiment intensity.
+\end{itemize}
+
+\section{Model Implementation: Ensemble Theory}
 The prediction task is framed as a supervised binary classification problem. We implement the following models:
 \begin{itemize}
-    \item \textbf{XGBoost:} A gradient boosting framework selected for its efficiency in handling non-linear interactions and redundant features (multicollinearity).
-    \item \textbf{Random Forest:} Used as an ensemble benchmark to evaluate performance stability across different asset classes.
+    \item \textbf{XGBoost:} A gradient boosting framework that builds decision trees sequentially to minimize a loss function \citep{chen2016}. Theoretically, this reduces the \textbf{Bias-Variance Trade-off} by focusing on the residual errors of previous iterations.
+    \item \textbf{Random Forest:} Used as an ensemble benchmark to evaluate performance stability across different asset portfolios.
 \end{itemize}
 
-The training follows a strict time-series cross-validation strategy to prevent look-ahead bias, ensuring the model only learns from historically available information.
-
-\section{Evaluation Metrics}
-Model performance is assessed using standard classification metrics: Accuracy, Precision, Recall, and the F1-score. These metrics highlight the model's ability to minimize false "Buy" signals, which is critical for financial risk management.
+\section{Hyperparameter Optimization}
+To prevent underfitting and over-fitting, a grid search was performed over the follow space: \texttt{max\_depth} [3, 5, 7], \texttt{learning\_rate} [0.01, 0.1, 0.2], and \texttt{n\_estimators} [50, 100, 200]. Optimal parameters were selected based on the F1-score to maintain a scientific balance between Precision and Recall.

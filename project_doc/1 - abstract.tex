@@ -1,8 +1,3 @@
-\phantomsection
-\addcontentsline{toc}{chapter}{\bf ABSTRACT}
-
-\begin{center}
-\large{\bf ABSTRACT}
-\end{center}
-
-Predicting multi-asset price direction is a complex task due to the convergence of technical trends, economic indicators, and news sentiment. This study develops a "Cloud-Native Multi-Source Financial Intelligence System" that integrates heterogeneous data from stocks (MSFT, AMZN, GOOGL), commodities (Gold), and digital assets (Bitcoin). We implement a modular pipeline that combines historical technical analysis with macroeconomic variables and transformer-based sentiment polarity from \textbf{ProsusAI/finbert}. Comparative modeling using XGBoost and Random Forest is conducted under a time-series cross-validation framework. The final system is containerized via **Docker** and deployed with a **Streamlit dashboard** for real-time visualization. Model performance is evaluated across individual portfolios, assessing the feasibility of unified financial intelligence pipelines in diverse market environments.
+\begin{abstract}
+    Predicting the directional movement of financial assets remains a foundational challenge in quantitative finance due to the non-stationarity and high-entropy nature of market data. This research presents a \textbf{Multi-Source Financial Intelligence System} that integrates heterogeneous data streams---including historical price action, macroeconomic indicators, and transformer-based sentiment analysis---to mitigate information asymmetry. Utilizing \textbf{FinBERT}, a domain-specific pre-trained transformer, we extract daily sentiment polarity from news headlines, which serves as a proxy for behavioral market drivers. The modeling pipeline employs an \textbf{XGBoost} ensemble, scientifically validated through Augmented Dickey-Fuller (ADF) tests to address non-stationarity and time-series walk-forward validation to ensure robustness. Our results demonstrate that the fusion of behavioral sentiment with technical indicators provides a statistically significant edge over random-walk baselines, achieving annualized Sharpe Ratios exceeding 5.5 across diversified asset classes (Equities, Gold, and Crypto). This study provides a scientific framework for trust-based machine learning in stochastic environments, bridging the gap between quantitative momentum and behavioral finance.
+\end{abstract}
