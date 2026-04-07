@@ -1,0 +1,100 @@
+\documentclass[12pt,a4paper]{report}
+
+% -------------------- Packages --------------------
+\usepackage{svg}
+\usepackage{amsmath,amssymb}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{listings}
+\usepackage{tcolorbox}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{setspace}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{titlesec}
+\usepackage{qrcode}
+\usepackage[round]{natbib}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, calc}
+
+\setstretch{1.5}
+
+% -------------------- Code Block Styling --------------------
+\lstset{
+  breaklines=true,
+  basicstyle=\footnotesize\ttfamily,
+  lineskip=0.5ex
+}
+\tcbuselibrary{listingsutf8}
+\tcolorboxenvironment{lstlisting}{colback=gray!5!white, colframe=gray!80!black, boxrule=0.5pt, arc=3pt}
+
+% -------------------- Chapter & Section Formatting --------------------
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries\centering}
+  {\large\MakeUppercase{CHAPTER \thechapter}}
+  {1ex}
+  {\large\MakeUppercase}
+\titlespacing*{\chapter}{0pt}{-10pt}{20pt}
+
+\titleformat{\section}
+  {\bfseries\normalsize}
+  {\thesection\quad}
+  {0em}
+  {}
+
+\titleformat{\subsection}
+  {\bfseries\normalsize}
+  {\thesubsection\quad}
+  {0em}
+  {}
+
+% ==============================================================
+\begin{document}
+
+    % -------------------- Front Matter --------------------
+    \pagenumbering{roman}
+    \addtocontents{toc}{~\hfill\textbf{Page}\par}
+    \include{0 - cover}
+    \include{1 - abstract}
+
+    % ----- Table of Contents -----
+    \clearpage
+    \phantomsection
+    \renewcommand{\contentsname}{\bf Table of Contents}
+    \tableofcontents
+    
+    % -------------------- Main Content --------------------
+    \cleardoublepage
+    \pagenumbering{arabic}
+    \include{2 - introduction}
+    \include{3 - Dataset and Data Collection}
+    \include{4 - methodology}
+    \include{6 - Model Selection and Implementation}
+    \include{7 - Model Evaluation}
+    \include{8 - Results interpretation}
+    \include{9 - conclusion}
+
+    % -------------------- Back Matter --------------------
+    % \include{declaration}
+    % \include{loft}
+
+    \newpage\pagestyle{plain}
+    \include{appendix}
+
+    \pagestyle{plain}  
+    \newpage
+    \phantomsection
+    
+    % References will automatically create a chapter/section
+    \nocite{*}
+
+    \bibliographystyle{apalike}
+    \bibliography{references}  % This generates the references page
+
+\end{document}
+

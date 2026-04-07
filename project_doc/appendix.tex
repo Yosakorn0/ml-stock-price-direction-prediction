@@ -1,0 +1,114 @@
+\appendix
+
+\chapter{Code Repository}
+The complete implementation of this project is publicly available at:
+
+\begin{center}
+\url{https://github.com/Yosakorn0/ml-stock-price-direction-prediction}
+
+\vspace{0.5cm}
+
+\qrcode[height=3cm]{https://github.com/Yosakorn0/ml-stock-price-direction-prediction}
+\end{center}
+
+The repository ensures full reproducibility of the data collection and preprocessing pipeline. It includes modular API connectors, feature engineering scripts, validation procedures, and exploratory analysis notebooks. All experiments are version-controlled to maintain transparency, traceability, and research integrity.
+
+\chapter{Architecture Diagrams}
+\label{app:diagrams}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=1.5cm,
+    box/.style={rectangle, draw=black, thick, fill=blue!10, text width=5cm, align=center, minimum height=1cm},
+    arrow/.style={thick, ->, >=stealth}
+]
+% Nodes
+\node (data) [box] {Data Collection};
+\node (preprocess) [box, below of=data] {Data Preprocessing};
+\node (feature) [box, below of=preprocess] {Feature Engineering};
+\node (eda) [box, below of=feature] {Exploratory Data Analysis};
+\node (train) [box, below of=eda] {Model Training};
+\node (eval) [box, below of=train] {Evaluation};
+\node (output) [box, below of=eval] {Prediction Output};
+
+% Arrows
+\draw [arrow] (data) -- (preprocess);
+\draw [arrow] (preprocess) -- (feature);
+\draw [arrow] (feature) -- (eda);
+\draw [arrow] (eda) -- (train);
+\draw [arrow] (train) -- (eval);
+\draw [arrow] (eval) -- (output);
+\end{tikzpicture}
+\caption{System Architecture Pipeline}
+\label{fig:system_architecture}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=1.5cm and 2cm,
+    box/.style={rectangle, draw=black, thick, fill=gray!10, text width=4cm, align=center, minimum height=1cm},
+    modelbox/.style={rectangle, draw=black, thick, fill=orange!10, text width=3.5cm, align=center, minimum height=1cm},
+    arrow/.style={thick, ->, >=stealth}
+]
+
+% Nodes
+\node (input) [box] {Input Data};
+\node (feature) [box, below of=input] {Feature Engineering};
+\node (split) [box, below of=feature] {Train/Test Split};
+
+\node (xgb) [modelbox, below of=split, node distance=2.5cm] {XGBoost};
+\node (lr) [modelbox, left of=xgb, node distance=4cm] {Logistic Regression};
+\node (lstm) [modelbox, right of=xgb, node distance=4cm] {LSTM};
+
+\node (eval) [box, below of=xgb, node distance=2.5cm] {Evaluation Metrics};
+
+% Arrows
+\draw [arrow] (input) -- (feature);
+\draw [arrow] (feature) -- (split);
+\draw [arrow] (split) -| (lr);
+\draw [arrow] (split) -- (xgb);
+\draw [arrow] (split) -| (lstm);
+\draw [arrow] (lr) |- (eval);
+\draw [arrow] (xgb) -- (eval);
+\draw [arrow] (lstm) |- (eval);
+
+\end{tikzpicture}
+\caption{Model Comparison Architecture}
+\label{fig:model_comparison}
+\end{figure}
+
+\chapter{Exploratory Data Analysis Visualizations}
+\label{app:eda}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{images/time_series_price.png}
+  \caption{Multi-Asset Historical Trends (2020-2026).}
+  \label{fig:time_series}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.45\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{images/returns_distribution.png}
+    \caption{Distribution of Daily Returns.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.45\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{images/outlier_boxplot.png}
+    \caption{Boxplot for Outlier Detection.}
+  \end{subfigure}
+  \caption{Statistical analysis of daily return variance across tech assets.}
+  \label{fig:returns_analysis}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{images/correlation_heatmap.png}
+  \caption{Correlation heatmap of technical indicators and sentiment scores.}
+  \label{fig:correlation}
+\end{figure}

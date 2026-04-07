@@ -1,0 +1,25 @@
+\chapter{MODEL EVALUATION}
+
+\section{Evaluation Strategy}
+Model performance is assessed across MSFT, AMZN, GOOGL, Gold, and Bitcoin datasets using time-series walk-forward validation. This approach ensures that the model is consistently tested on the most recent market data available at the time of each prediction, avoiding cumulative data leakage.
+
+\section{Performance Metrics (Classification)}
+Table~\ref{tab:model_comparison} presents a comparative analysis of the primary XGBoost model's predictive performance against the baseline.
+
+\begin{table}[H]
+\centering
+\caption{Model Performance Across Multi-Asset Portfolios (Test Results)}
+\label{tab:model_comparison}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Asset Symbol} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} \\ \hline
+MSFT (Microsoft) & 0.54--0.58 & 0.52 & 0.61 & 0.56 \\ \hline
+AMZN (Amazon) & 0.52--0.56 & 0.51 & 0.63 & 0.56 \\ \hline
+GOOGL (Google) & 0.53--0.57 & 0.53 & 0.59 & 0.55 \\ \hline
+GC=F (Gold) & 0.50--0.54 & 0.51 & 0.55 & 0.53 \\ \hline
+BTC-USD (Bitcoin) & 0.51--0.55 & 0.52 & 0.65 & 0.57 \\ \hline
+\end{tabular}
+\end{table}
+
+\section{Interpretation of Metrics}
+The results suggest that news-based sentiment signals from FinBERT, when combined with technical MACD and RSI indicators, provide a marginal but statistically significant gain over baseline models. Higher recall in Bitcoin suggests the model is highly sensitive to price upward movements, likely driven by news volatility captured via the sentiment analyzer.

@@ -1,0 +1,35 @@
+\titlespacing*{\section}{0pt}{6pt}{4pt}
+
+\chapter{Dataset}
+
+\section{Data Source}
+The project integrates heterogeneous data from multiple financial and macroeconomic providers to create a holistic predictive feature set:
+\begin{itemize}\setlength\itemsep{2pt}
+    \item \textbf{Yahoo Finance} -- OHLCV and adjusted close data for a diverse multi-asset portfolio (MSFT, AMZN, GOOGL, GC=F, BTC-USD).
+    \item \textbf{Federal Reserve Economic Data (FRED)} -- Macroeconomic variables including interest rates (FEDFUNDS) and inflation.
+    \item \textbf{Finnhub API} -- Primary source for real-time company news metadata used for sentiment analysis.
+\end{itemize}
+
+\section{Dataset Description}
+The finalized dataset represents a daily time-series from 2020 to 2026 across five asset classes (Tech, Commodities, Crypto). Each observation is a daily snapshot aligned across market price, technical indicators, and news-based sentiment signals. The target variable is binary, representing whether the next trading day's price will close higher than the current day.
+
+\section{Data Dictionary}
+The unified dataset contains 12 core features per asset. Table~\ref{tab:feature_dictionary} illustrates the data structure.
+
+\begin{table}[H]
+\centering
+\caption{Data Dictionary}
+\label{tab:feature_dictionary}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Feature} & \textbf{Data Type} & \textbf{Description} \\ \hline
+Price (O,H,L,C) & float64 & Daily market price points \\ \hline
+Volume & int64 & Number of shares/units traded \\ \hline
+MA (10, 50) & float64 & Short and long-term moving averages \\ \hline
+RSI & float64 & Relative Strength Index (Momentum) \\ \hline
+MACD & float64 & Trend-following momentum indicator \\ \hline
+Sentiment Score & float64 & Polarity score (-1 to 1) from FinBERT \\ \hline
+Macro Indicators & float64 & FED funds rate and unemployment data \\ \hline
+Target & int64 & Binary label (1=Price Up, 0=Down) \\ \hline
+\end{tabular}
+\end{table}

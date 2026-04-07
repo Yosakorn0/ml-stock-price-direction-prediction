@@ -1,0 +1,8 @@
+\phantomsection
+\addcontentsline{toc}{chapter}{\bf ABSTRACT}
+
+\begin{center}
+\large{\bf ABSTRACT}
+\end{center}
+
+Predicting multi-asset price direction is a complex task due to the convergence of technical trends, economic indicators, and news sentiment. This study develops a "Cloud-Native Multi-Source Financial Intelligence System" that integrates heterogeneous data from stocks (MSFT, AMZN, GOOGL), commodities (Gold), and digital assets (Bitcoin). We implement a modular pipeline that combines historical technical analysis with macroeconomic variables and transformer-based sentiment polarity from \textbf{ProsusAI/finbert}. Comparative modeling using XGBoost and Random Forest is conducted under a time-series cross-validation framework. The final system is containerized via **Docker** and deployed with a **Streamlit dashboard** for real-time visualization. Model performance is evaluated across individual portfolios, assessing the feasibility of unified financial intelligence pipelines in diverse market environments.

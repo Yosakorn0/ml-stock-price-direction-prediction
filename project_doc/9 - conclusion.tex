@@ -1,0 +1,20 @@
+\chapter{CONCLUSION AND FUTURE WORK}
+
+\section{Summary of System Capabilities}
+This project successfully developed a \textbf{Multi-Source Financial Intelligence System} that integrates multiple asset classes, from equity to digital gold (Bitcoin). By combining technical indicators, macroeconomic data, and sentiment-aware NLP (ProsusAI/finbert), the system achieves a holistic view of price directionality that traditional models often miss. The deployment via **Docker** and a **Streamlit Dashboard** transforms mathematical findings into a practical tool for real-time market analysis.
+
+\section{Key Contributions}
+The primary contributions of this project include:
+\begin{itemize}
+    \item \textbf{Generalized Pipelines}: Moving from single-asset analysis to a robust multi-asset portfolio architecture.
+    \item \textbf{Transformer-Based Sentiment}: Successfully integrating real-time FinBERT polarity into a classification target.
+    \item \textbf{End-to-End Orchestration}: Automating ingestion, training, and visualization in a portable, containerized environment.
+\end{itemize}
+
+\section{Future Research}
+Future development will focus on:
+\begin{itemize}
+    \item \textbf{Intraday Resolution}: Transitioning from daily to hourly (or 15-minute) prediction intervals for high-frequency trading.
+    \item \textbf{Advanced RNN Architectures}: Evaluating LSTM and Transformer-based time-series models for regression (target price) alongside binary classification.
+    \item \textbf{Broker API Integration}: Enabling automated order execution based on the system's generated signals.
+\end{itemize}

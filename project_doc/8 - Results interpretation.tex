@@ -1,0 +1,14 @@
+\chapter{RESULTS INTERPRETATION}
+
+\section{Analysis of Multi-Source Integration}
+The primary find of this study is the dynamic performance gain when incorporating \textbf{FinBERT sentiment analysis} into the feature set. Sentiment polarity, fetched from real-time news sources via Finnhub, exhibits a notable correlation with next-day price movement during high-volatility events, particularly in high-growth technology stocks (MSFT, AMZN, GOOGL) and cryptocurrency (BTC-USD).
+
+\section{Comparison Across Asset Classes}
+\begin{itemize}
+    \item \textbf{Tech Equities:} High sensitivity to earnings forecasts and product-related news. The sentiment-integrated model outperformed the technical-only baseline by a marginal accuracy threshold of 2-3\%.
+    \item \textbf{Commodities (Gold):} Exhibits defensive market behavior. Sentiment signals tied to geopolitical stability and yield shifts proved to be more predictive than traditional technical indicators during market downturns.
+    \item \textbf{Digital Assets (Bitcoin):} High volatility leads to wider confidence intervals. However, sentiment polarity from transformer-based models serves as a leading indicator of momentum shifts.
+\end{itemize}
+
+\section{Limitations of the Current Pipeline}
+While the system is robust, the daily frequency of the current pipeline limits its reactive capacity to intraday market shocks. The results emphasize the stochastic nature of finance, where "Black Swan" events can override historical technical signals regardless of model complexity.

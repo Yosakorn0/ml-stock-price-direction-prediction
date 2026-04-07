@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  dashboard:
+    build: .
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env.local
+    volumes:
+      - .:/app
+    command: streamlit run dashboard/app.py --server.port=8501 --server.address=0.0.0.0
+
+  worker:
+    build: .
+    env_file:
+      - .env.local
+    volumes:
+      - .:/app
+    # The worker can be used to manually run the training/ingestion scripts
+    # e.g., docker-compose run worker python -m src.data.preprocessing
+    command: tail -f /dev/null

@@ -1,0 +1,30 @@
+\chapter{METHODOLOGY}
+
+\section{System Architecture}
+The system architecture follows a modular, unified data pipeline designed for high-frequency daily ingestion and processing. The workflow is orchestrated across four primary stages: ingestion, feature engineering, NLP sentiment analysis, and predictive modeling (see Appendix~\ref{app:diagrams}, Figure~\ref{fig:system_architecture}).
+
+\section{Data Preprocessing and EDA}
+The dataset was preprocessed using automated validation scripts to ensure zero-null integrity and consistent data types across heterogeneous sources. Exploratory Data Analysis (EDA) was conducted to identify volatility clusters and trend persistence in the multi-asset portfolio. Due to the diverse nature of the assets (e.g., Bitcoin's 24/7 trading vs. US Stock market hours), forward-filling interpolation was used to align the time-series. Detailed historical trends, return distributions, and correlation heatmaps are provided in Appendix~\ref{app:eda}.
+
+\section{Sentiment Analysis (FinBERT)}
+A critical component of the methodology is the integration of a transformer-based NLP stage. We utilize \textbf{ProsusAI/finbert}, a pre-trained BERT model fine-tuned specifically for financial language. The pipeline fetches the latest news headlines from the Finnhub API for each asset and generates a daily polarity score. This score enables the model to capture the "news-driven" component of price volatility, which technical indicators alone often overlook.
+
+\section{Feature Engineering}
+Technical indicators were calculated per asset to provide momentum and trend-following signals:
+\begin{itemize}
+    \item \textbf{Momentum:} Relative Strength Index (RSI) and MACD.
+    \item \textbf{Volatility:} Bollinger Bands (Upper/Lower).
+    \item \textbf{Trend:} 10-day and 50-day Moving Averages.
+\end{itemize}
+
+\section{Model Implementation}
+The prediction task is framed as a supervised binary classification problem. We implement the following models:
+\begin{itemize}
+    \item \textbf{XGBoost:} A gradient boosting framework selected for its efficiency in handling non-linear interactions and redundant features (multicollinearity).
+    \item \textbf{Random Forest:} Used as an ensemble benchmark to evaluate performance stability across different asset classes.
+\end{itemize}
+
+The training follows a strict time-series cross-validation strategy to prevent look-ahead bias, ensuring the model only learns from historically available information.
+
+\section{Evaluation Metrics}
+Model performance is assessed using standard classification metrics: Accuracy, Precision, Recall, and the F1-score. These metrics highlight the model's ability to minimize false "Buy" signals, which is critical for financial risk management.

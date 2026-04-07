@@ -1,0 +1,16 @@
+\chapter{MODEL IMPLEMENTATION}
+
+\section{XGBoost Classifier Selection}
+The primary model selected for this system is the \textbf{XGBoost (Extreme Gradient Boosting)} classifier. Unlike standard linear models, XGBoost uses gradient boosting over decision trees to capture high-order feature interactions, making it particularly effective for financial datasets where the relationship between technical indicators and price movement is rarely linear. The model's inherent ability to handle redundant features (multicollinearity) through regularization and subsampling further justifies its selection for our multi-asset feature set.
+
+\section{Implementation Environment}
+The system is built using Python 3.11, leveraging the \texttt{xgboost}, \texttt{scikit-learn}, and \texttt{transformers} libraries. A unified preprocessor stage aligns news sentiment with market data, while \texttt{joblib} is used for model serialization and persistent inference.
+
+\section{Deployment Architecture}
+To ensure portability and ease of accessibility, the entire intelligence system is containerized using \textbf{Docker}.
+
+\begin{itemize}
+    \item \textbf{Docker Containerization}: The solution is orchestrated via \texttt{docker-compose}, separating the reactive dashboard from the background data ingestion and training worker. This allows for horizontal scaling and consistent performance across local and cloud environments.
+    
+    \item \textbf{Streamlit Dashboard}: The primary user interface is implemented using the \textbf{Streamlit} framework. This provides a dynamic, real-time visualization layer where users can select assets, trigger predictions, and view sentiment gauges derived from FinBERT. The dashboard abstracts the complexity of the underlying ML models into actionable Buy/Sell/Neutral indicators.
+\end{itemize}

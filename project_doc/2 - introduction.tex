@@ -1,0 +1,15 @@
+\chapter{INTRODUCTION}
+
+This project develops a "Cloud-Native Multi-Source Financial Intelligence System" designed to predict the direction of financial markets by integrating heterogeneous data sources. Moving beyond single-asset analysis, the system implements a generalized machine learning pipeline for a diverse portfolio including equities (MSFT, AMZN, GOOGL), commodities (Gold), and digital assets (Bitcoin). By combining historical price action with macroeconomic variables and automated sentiment analysis using \textbf{ProsusAI/finbert}, the study explores the predictive synergy of technical and fundamental signals in highly volatile environments.
+
+\section{Statement of the Problem}
+Stock markets are inherently noisy and influenced by a convergence of technical trends, economic shifts, and public sentiment. Identifying reliable predictive signals remains a significant challenge, especially when relying on traditional linear models that fail to capture the non-linear, time-varying dynamics of multi-asset classes. This project addresses the "noise-to-signal" problem by building an end-to-end intelligence system that automates the ingestion and alignment of disparate data sources.
+
+\section{Objectives}
+The primary objectives of this study are:
+\begin{itemize}
+    \item To design a unified data engineering pipeline for multi-asset market, macro, and sentiment data collection.
+    \item To implement a natural language processing stage using transformer-based models (FinBERT) for automated news sentiment extraction.
+    \item To train and evaluate robust ensemble models (XGBoost, Random Forest) for next-day direction classification.
+    \item To deploy a real-time dashboard and containerized environment for persistent financial intelligence.
+\end{itemize}

@@ -1,0 +1,14 @@
+yfinance
+pandas
+pandas-datareader
+numpy
+finnhub-python
+requests
+python-dotenv
+plotly
+transformers
+torch
+xgboost
+scikit-learn
+joblib
+streamlit
