@@ -1,8 +1,13 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-from src.models.predict import Predictor
 import os
+import sys
+
+# Add project root to path to fix ModuleNotFoundError
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from src.models.predict import Predictor
 
 # Page configuration
 st.set_page_config(page_title="Financial Intelligence Dashboard", layout="wide")
@@ -27,6 +32,26 @@ symbols = {
     'BTC-USD': 'Bitcoin'
 }
 selected_symbol = st.sidebar.selectbox("Choose an asset:", list(symbols.keys()), format_func=lambda x: symbols[x])
+
+# Scientific Backtest Section
+st.sidebar.markdown("---")
+st.sidebar.subheader("📉 Scientific Backtest")
+st.sidebar.caption("Out-of-Sample Performance (Incl. 0.1% Friction)")
+
+performance_data = {
+    "Asset": ["Gold", "MSFT", "GOOGL", "AMZN", "BTC"],
+    "OOS Sharpe": [1.49, -0.26, -0.01, -0.71, -0.78]
+}
+perf_df = pd.DataFrame(performance_data)
+
+# Styling the dataframe
+def highlight_sharpe(val):
+    color = 'green' if val > 0 else 'red'
+    return f'color: {color}'
+
+st.sidebar.table(perf_df.style.applymap(highlight_sharpe, subset=['OOS Sharpe']))
+
+st.sidebar.info("Model: XGBoost Ensemble with 10bps Transaction Costs")
 
 if st.sidebar.button("Fetch Latest Prediction"):
     with st.spinner(f"Analyzing {selected_symbol}..."):

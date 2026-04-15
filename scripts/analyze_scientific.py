@@ -17,36 +17,53 @@ def calculate_adf(file_path):
         'crit_5': res[4]['5%']
     }
 
-def calculate_sharpe(file_path, model_path):
-    """Calculate Sharpe Ratio for the XGBoost strategy."""
+def calculate_sharpe(file_path, model_path, transaction_cost=0.001):
+    """Calculate Out-of-Sample Sharpe Ratio with transaction costs."""
     if not os.path.exists(model_path):
         return None
         
     df = pd.read_csv(file_path, index_col=0, parse_dates=True)
     model = joblib.load(model_path)
     
-    # Prepare features (same as train.py)
+    # Prepare features
     X = df.drop(columns=['Target'])
-    y = df['Target']
     
-    # Simple strategy: If pred=1, long; else, stay flat (or short, but let's do long/flat)
-    y_pred = model.predict(X)
+    # Split: only evaluate on the last 20% (Test Set)
+    split_idx = int(len(df) * 0.8)
+    X_test = X.iloc[split_idx:]
+    df_test = df.iloc[split_idx:].copy()
+    
+    # Predict signals
+    y_pred = model.predict(X_test)
+    df_test['Signal'] = y_pred
     
     # Daily returns
-    df['Returns'] = df['Close'].pct_change()
+    df_test['Returns'] = df_test['Close'].pct_change()
     
-    # Strategy returns (Assume next-day return if signal is today)
-    # Note: Shift(1) because signal at T predicts T+1
-    df['Strategy_Returns'] = df['Returns'].shift(-1) * y_pred
+    # Strategy returns (Next-day return if signal is today)
+    # Signal at T holds from T to T+1
+    df_test['Raw_Strategy_Returns'] = df_test['Returns'].shift(-1) * df_test['Signal']
     
-    strat_rets = df['Strategy_Returns'].dropna()
+    # Transaction Costs: applied when signal changes
+    # We shift Signal to find changes
+    df_test['Trades'] = df_test['Signal'].diff().abs()
+    # Fill first trade if Signal[0] == 1
+    df_test.loc[df_test.index[0], 'Trades'] = df_test['Signal'].iloc[0]
+    
+    df_test['Cost'] = df_test['Trades'] * transaction_cost
+    df_test['Net_Strategy_Returns'] = df_test['Raw_Strategy_Returns'] - df_test['Cost']
+    
+    strat_rets = df_test['Net_Strategy_Returns'].dropna()
     if len(strat_rets) == 0:
-        return 0
+        return 0, 0
         
     # Annualized Sharpe (Assuming 252 trading days)
-    # Assuming 0% risk-free rate for simplicity
-    sharpe = np.sqrt(252) * (strat_rets.mean() / strat_rets.std())
-    return sharpe
+    # Annualized Return / Annualized Std
+    ann_return = strat_rets.mean() * 252
+    ann_vol = strat_rets.std() * np.sqrt(252)
+    
+    sharpe = ann_return / ann_vol if ann_vol > 0 else 0
+    return sharpe, ann_return
 
 def analyze():
     processed_dir = "data/processed"
@@ -69,13 +86,15 @@ def analyze():
         adf_res = calculate_adf(feat_path)
         
         # Sharpe Ratio
-        sharpe = calculate_sharpe(feat_path, mod_path)
+        sharpe_res = calculate_sharpe(feat_path, mod_path)
         
         print(f"\n{asset}:")
         print(f" - ADF Stat: {adf_res['adf_stat']:.4f} (p={adf_res['p_value']:.4f})")
         print(f" - Stationarity: {'Stationary' if adf_res['p_value'] < 0.05 else 'Non-Stationary'}")
-        if sharpe:
-            print(f" - Annualized Sharpe Ratio: {sharpe:.4f}")
+        if sharpe_res:
+            sharpe, ann_ret = sharpe_res
+            print(f" - OOS Annualized Sharpe Ratio: {sharpe:.4f}")
+            print(f" - OOS Annualized Return: {ann_ret:.2%}")
         else:
             print(" - Sharpe Ratio: Model not found")
 

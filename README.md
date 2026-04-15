@@ -56,8 +56,9 @@ The project normalizes and aligns data from disparate sources:
 ## 🧠 Modeling & Prediction Strategy
 
 - **Classification**: Predicting upward or downward market movement (Binary Target).
-- **Models**: Ensemble methods (**Random Forest**, **XGBoost**).
-- **Evaluation**: Accuracy, Precision, Recall, and AUC-ROC.
+- **Models**: Ensemble methods (**XGBoost** with Randomized Search tuning).
+- **Interpretability**: **SHAP (Shapley Additive Explanations)** for feature importance analysis.
+- **Evaluation**: Accuracy, Precision, Recall, and **Annualized Sharpe Ratio** (including 0.1% transaction cost).
 
 ## 📊 Model Performance Summary
 
@@ -136,6 +137,16 @@ If running outside of Docker, follow these steps in order:
 3. **Launch the Dashboard**:
    ```bash
    streamlit run dashboard/app.py
+   ```
+
+4. **Analyze the model**:
+   ```bash
+   python scripts/analyze_scientific.py
+   ```
+
+5. **Generate the report**:
+   ```bash
+   python scripts/generate_report.py
    ```
 
 ## 🔗 Resources

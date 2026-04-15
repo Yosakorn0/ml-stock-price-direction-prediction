@@ -39,18 +39,22 @@ class TechnicalFeatures:
             # For each asset in the MultiIndex
             symbols = df.columns.get_level_values(1).unique()
             for symbol in symbols:
-                df[('MA10', symbol)] = df[('Close', symbol)].rolling(window=10).mean()
-                df[('MA50', symbol)] = df[('Close', symbol)].rolling(window=50).mean()
+                df[('MA10_Dist', symbol)] = (df[('Close', symbol)] - df[('Close', symbol)].rolling(window=10).mean()) / df[('Close', symbol)].rolling(window=10).mean()
+                df[('MA50_Dist', symbol)] = (df[('Close', symbol)] - df[('Close', symbol)].rolling(window=50).mean()) / df[('Close', symbol)].rolling(window=50).mean()
                 df[('RSI', symbol)] = self.calculate_rsi(df[('Close', symbol)])
                 df[('MACD', symbol)], _ = self.calculate_macd(df[('Close', symbol)])
-                df[('UPPER', symbol)], df[('LOWER', symbol)] = self.calculate_bollinger_bands(df[('Close', symbol)])
+                upper, lower = self.calculate_bollinger_bands(df[('Close', symbol)])
+                df[('BB_Upper_Dist', symbol)] = (upper - df[('Close', symbol)]) / df[('Close', symbol)]
+                df[('BB_Lower_Dist', symbol)] = (lower - df[('Close', symbol)]) / df[('Close', symbol)]
                 df[('Daily_Return', symbol)] = df[('Close', symbol)].pct_change()
         else:
-            df['MA10'] = df['Close'].rolling(window=10).mean()
-            df['MA50'] = df['Close'].rolling(window=50).mean()
+            df['MA10_Dist'] = (df['Close'] - df['Close'].rolling(window=10).mean()) / df['Close'].rolling(window=10).mean()
+            df['MA50_Dist'] = (df['Close'] - df['Close'].rolling(window=50).mean()) / df['Close'].rolling(window=50).mean()
             df['RSI'] = self.calculate_rsi(df['Close'])
             df['MACD'], _ = self.calculate_macd(df['Close'])
-            df['UPPER'], df['LOWER'] = self.calculate_bollinger_bands(df['Close'])
+            upper, lower = self.calculate_bollinger_bands(df['Close'])
+            df['BB_Upper_Dist'] = (upper - df['Close']) / df['Close']
+            df['BB_Lower_Dist'] = (lower - df['Close']) / df['Close']
             df['Daily_Return'] = df['Close'].pct_change()
             
         return df.dropna()

@@ -24,21 +24,21 @@ class Preprocessor:
             market_data.columns = market_data.columns.get_level_values(0)
             
         # 2. Add Technical Features
-        df = self.tech_features.add_all_features(market_data)
+        df = market_data.copy()
+        df = self.tech_features.add_all_features(df)
         
-        # 3. Add Sentiment (Last 30 days for demonstration/test)
-        # Note: In a production env, sentiment would be fetched daily/stored
+        # 3. Add Sentiment
         print(f"Fetching sentiment for {symbol}...")
         sentiment = self.analyzer.get_daily_sentiment(symbol, days=30)
         
         if not sentiment.empty:
-            df['Sentiment'] = df.index.map(lambda x: sentiment.get(x.date(), 0))
-            df['Sentiment'] = df['Sentiment'].fillna(0) # Default to neutral
+            df.loc[:, 'Sentiment'] = df.index.map(lambda x: sentiment.get(x.date(), 0))
+            df.loc[:, 'Sentiment'] = df['Sentiment'].fillna(0)
         else:
-            df['Sentiment'] = 0
+            df.loc[:, 'Sentiment'] = 0
             
         # 4. Create Target (1 if Price goes up tomorrow, else 0)
-        df['Target'] = (df['Close'].shift(-1) > df['Close']).astype(int)
+        df.loc[:, 'Target'] = (df['Close'].shift(-1) > df['Close']).astype(int)
         
         # 5. Optional Macro Data (Feature Consistency)
         if include_macro:
