@@ -8,7 +8,7 @@ Model performance is assessed across MSFT, AMZN, GOOGL, Gold, and Bitcoin datase
 \end{enumerate}
 
 \section{Scientific Performance Metrics}
-The comparative analysis of accuracy and the corresponding F1-scores is presented in Appendix Table~\ref{tab:model_comparison}. We observe a consistent 3--5\% performance gain when behavioral sentiment is integrated, suggesting that news-driven signals provide a non-redundant predictive alpha.
+The comparative analysis of metrics is presented in Appendix Table~\ref{tab:model_comparison}. Unlike traditional accuracy, we prioritize the F1-score and **Out-of-Sample (OOS) Sharpe Ratio** to measure generalizability. While behavioral sentiment provides a 1--3\% accuracy lift, its primary value is in reducing the "entropy" of the predictive signals during news-heavy market regimes.
 
-\section{Trust and Risk Analysis: Sharpe Ratios}
-To establish the "Scientific Trust" of the model beyond simple accuracy, we calculate the **Annualized Sharpe Ratio** based on a simulated directional strategy. A Sharpe ratio $> 1.0$ is generally considered excellent for algorithmic trading; our model's performance relative to the Buy \& Hold baseline is detailed in Appendix Table~\ref{tab:sharpe_ratios}, confirming the successful capture of risk-adjusted momentum.
+\section{Trust and Risk Analysis: OOS Sharpe Ratios}
+To establish "Scientific Trust" and avoid the pitfalls of evaluation bias, we strictly isolate the final performance metrics to the **Out-of-Sample (Test) set**, which comprises the last 20\% of the data chronological. Furthermore, the annualized Sharpe ratio calculation includes a 0.1\% transaction cost per trade. This rigorous "Reality Check" prevents the reporting of inflated metrics caused by train-set leakage or unrealistic execution assumptions (see Appendix Table~\ref{tab:sharpe_ratios}).

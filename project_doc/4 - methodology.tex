@@ -12,12 +12,15 @@ Exploratory Data Analysis (EDA) was conducted to scientifically validate the dat
 \end{itemize}
 
 \section{Scientific Feature Engineering}
-Features were engineered to transform raw, non-stationary signals into predictive inputs:
+Features were engineered to transform raw, non-stationary signals into predictive, scale-invariant inputs:
 \begin{itemize}
+    \item \textbf{Normalized Technical Distances:} Moving Averages (10, 50) and Bollinger Bands were transformed into percentage distance metrics (e.g., $(Price - MA)/MA$). This ensures the features are stationary and scale-invariant, preventing the model from "learning" absolute price levels which do not generalize across time.
     \item \textbf{Returns-based Momentum:} Differencing the Close price into percentage returns avoids spurious regressions. RSI and MACD (12, 26, 9) quantify the velocity of these returns.
-    \item \textbf{Volatility Clustering:} Bollinger Bands capture period-specific variance, addressing the "GARCH-like" behavior of asset returns.
-    \item \textbf{Behavioral Signal Fusion:} Daily headlines were converted into a numeric polarity score (-1 to 1) using **FinBERT**. The rationale is based on the transformer's **Self-Attention Mechanism** \citep{vaswani2017}, which weighs contextual tokens (e.g., "federal" and "reserve") to decode sentiment intensity.
+    \item \textbf{Behavioral Signal Fusion:} Daily headlines were converted into a numeric polarity score (-1 to 1) using **FinBERT**. The rationale is based on the transformer's **Self-Attention Mechanism** \citep{vaswani2017}, which weighs contextual tokens to decode sentiment intensity.
 \end{itemize}
+
+\section{Market Friction and Backtesting Realism}
+A common pitfall in financial ML is the "frictionless assumption." To ensure scientific trust, our backtesting methodology incorporates a **10 basis point (0.1\%) transaction cost** per trade. This accounts for broker commissions and market slippage, ensuring that the reported Sharpe Ratios represent executable performance rather than theoretical artifacts.
 
 \section{Model Implementation: Ensemble Theory}
 The prediction task is framed as a supervised binary classification problem. We implement the following models:

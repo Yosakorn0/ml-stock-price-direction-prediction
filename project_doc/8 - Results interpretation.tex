@@ -10,10 +10,12 @@ The primary success of this study lies in the dynamic performance gain when inco
     \item \textbf{Digital Assets (Bitcoin):} High volatility leads to wider confidence intervals. However, the model exploits the irrational exuberance and "herd behavior" often observed in crypto markets, where sentiment polarity serves as a leading indicator of momentum.
 \end{itemize}
 
-\section{What the Numbers Mean: Trust and Entropy}
-The metrics obtained (Accuracy 54--58\% and Sharpe Ratios $> 5.0$) must be interpreted scientifically within the context of **market entropy**. A directional accuracy of 58\% indicates a statistically significant rejection of the **Null Hypothesis ($H_0$)** that market returns follow a random walk with zero mean. 
+\section{What the Numbers Mean: The "Reality Check"}
+The metrics obtained (Accuracy 46--61\% and OOS Sharpe Ratios typically $< 1.0$, except for Gold) represent a transparent and scientifically rigorous evaluation after adjusting for **market friction** and **evaluation bias**. 
 
-High Sharpe Ratios suggest that the XGBoost strategy captures persistent momentum phases with minimal drawdowns compared to a random trading baseline. We consider the model "Trustworthy" when the **Sentiment Polarity** and **RSI Momentum** signals are in alignment, as this confluence represents a convergence of behavioral and technical trend-persistence.
+A directional accuracy of ~50\% for major tech equities suggests that at a daily frequency, price movements in these highly liquid assets closely resemble a **Random Walk**. However, the XGBoost model identifies localized momentum in Gold (GC=F) with an OOS Sharpe of 1.49, suggesting that its defensive volatility patterns may be more predictable using the current feature set.
+
+We consider the model "Trustworthy" not because it predicts high returns, but because its evaluation protocol—using strictly isolated test sets and transaction costs—provides a conservative and reliable estimate of actual performance. This contrasts with "frictionless" models that falsely report high Sharpe ratios due to in-sample leakage and zero-cost assumptions.
 
 \section{Limitations and Stochastic Volatility}
 While the system is robust, the results emphasize the stochastic nature of finance, where "Black Swan" events or high-frequency news bursts can override historical signals. The non-stationarity identified in our ADF tests confirms that the model's predictive alpha is not static and requires continuous walk-forward retraining to mitigate model decay.

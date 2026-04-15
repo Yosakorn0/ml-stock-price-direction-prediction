@@ -4,7 +4,7 @@
 The primary model selected for this system is the \textbf{XGBoost (Extreme Gradient Boosting)} classifier. XGBoost was chosen over standard Gradient Boosting or deep learning (LSTM) due to its unique ability to handle tabular financial data with sparse NLP features. Theoretically, XGBoost addresses the non-linear dynamics of market volatility \citep{chen2016} by utilizing an ensemble of shallow decision trees to minimize a second-order Taylor expansion of the loss function.
 
 \section{Hyperparameter Optimization and Tuning}
-To ensure model robustness, we utilized an automated grid search for hyperparameter optimization. The objective was to minimize logarithmic loss while maximizing the F1-score across all five asset classes; the detailed search space and the optimal configuration selected for the final nodes are documented in Appendix Table~\ref{tab:hyperparameters}.
+To ensure model robustness, we utilized an automated randomized search for hyperparameter optimization. The objective was to minimize logarithmic loss while maximizing the accuracy across all five asset classes; the detailed search space and the optimal configuration selected for the final nodes are documented in Appendix Table~\ref{tab:hyperparameters}.
 
 \section{Bias Analysis and Testing}
 A rigorous scientific process requires the identification and mitigation of model bias.

@@ -124,11 +124,11 @@ The repository ensures full reproducibility of the data collection and preproces
 \begin{tabular}{|l|l|l|l|}
 \hline
 \textbf{Asset} & \textbf{ADF Statistic} & \textbf{p-value} & \textbf{Stationarity} \\ \hline
-MSFT & -1.7368 & 0.4123 & Non-Stationary \\ \hline
-AMZN & -1.9618 & 0.3036 & Non-Stationary \\ \hline
-GOOGL & 0.3860 & 0.9810 & Non-Stationary \\ \hline
-GC=F (Gold) & 2.3321 & 0.9990 & Non-Stationary \\ \hline
-BTC-USD (Bitcoin) & -1.3910 & 0.5866 & Non-Stationary \\ \hline
+MSFT & -1.7390 & 0.4112 & Non-Stationary \\ \hline
+AMZN & -1.9532 & 0.3075 & Non-Stationary \\ \hline
+GOOGL & 0.5083 & 0.9851 & Non-Stationary \\ \hline
+GC=F (Gold) & 2.5897 & 0.9991 & Non-Stationary \\ \hline
+BTC-USD (Bitcoin) & -1.3703 & 0.5964 & Non-Stationary \\ \hline
 \end{tabular}
 \end{table}
 
@@ -141,9 +141,10 @@ BTC-USD (Bitcoin) & -1.3910 & 0.5866 & Non-Stationary \\ \hline
 \textbf{Feature} & \textbf{Data Type} & \textbf{Description} \\ \hline
 Price (O,H,L,C) & float64 & Daily market price points \\ \hline
 Volume & int64 & Number of shares/units traded \\ \hline
-MA (10, 50) & float64 & Short and long-term moving averages \\ \hline
+MA Dist (10, 50) & float64 & Normalized distance $(Price - MA)/MA$ \\ \hline
 RSI & float64 & Relative Strength Index (Momentum) \\ \hline
 MACD & float64 & Trend-following momentum indicator \\ \hline
+BB Dist (U, L) & float64 & Normalized distance from Bollinger Bands \\ \hline
 Sentiment Score & float64 & Polarity score (-1 to 1) from FinBERT \\ \hline
 Macro Indicators & float64 & FED funds rate and unemployment data \\ \hline
 Target & int64 & Binary label (1=Price Up, 0=Down) \\ \hline
@@ -172,11 +173,11 @@ eval\_metric & [Fixed] & logloss \\ \hline
 \begin{tabular}{|l|c|c|c|c|}
 \hline
 \textbf{Asset Symbol} & \textbf{Tech Accuracy} & \textbf{Hybrid Accuracy} & \textbf{Precision} & \textbf{Recall} \\ \hline
-MSFT (Microsoft) & 0.52--0.54 & 0.56--0.58 & 0.52 & 0.61 \\ \hline
-AMZN (Amazon) & 0.49--0.52 & 0.54--0.56 & 0.51 & 0.63 \\ \hline
-GOOGL (Google) & 0.51--0.53 & 0.55--0.57 & 0.53 & 0.59 \\ \hline
-GC=F (Gold) & 0.48--0.51 & 0.52--0.54 & 0.51 & 0.55 \\ \hline
-BTC-USD (Bitcoin) & 0.50--0.53 & 0.55--0.59 & 0.52 & 0.65 \\ \hline
+MSFT (Microsoft) & 0.49 & 0.48 & 0.50 & 0.46 \\ \hline
+AMZN (Amazon) & 0.46 & 0.47 & 0.48 & 0.32 \\ \hline
+GOOGL (Google) & 0.47 & 0.48 & 0.48 & 0.23 \\ \hline
+GC=F (Gold) & 0.61 & 0.61 & 0.69 & 0.63 \\ \hline
+BTC-USD (Bitcoin) & 0.48 & 0.50 & 0.47 & 0.55 \\ \hline
 \end{tabular}
 \end{table}
 
@@ -187,11 +188,11 @@ BTC-USD (Bitcoin) & 0.50--0.53 & 0.55--0.59 & 0.52 & 0.65 \\ \hline
 \begin{tabular}{|l|l|l|}
 \hline
 \textbf{Asset} & \textbf{XGBoost Sharpe Ratio} & \textbf{Baseline (Buy \& Hold) Sharpe} \\ \hline
-MSFT & 6.9608 & 1.02--1.31 \\ \hline
-AMZN & 7.2303 & 0.85--1.14 \\ \hline
-GOOGL & 6.1860 & 0.94--1.22 \\ \hline
-GOLD (GC=F) & 7.8519 & 0.45--0.68 \\ \hline
-BTC-USD & 5.5237 & 1.15--1.67 \\ \hline
+MSFT & -0.2556 & 1.02--1.31 \\ \hline
+AMZN & -0.7130 & 0.85--1.14 \\ \hline
+GOOGL & -0.0070 & 0.94--1.22 \\ \hline
+GOLD (GC=F) & 1.4916 & 0.45--0.68 \\ \hline
+BTC-USD & -0.7812 & 1.15--1.67 \\ \hline
 \end{tabular}
 \end{table}
 
