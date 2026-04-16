@@ -1,10 +1,8 @@
----
 title: Machine Learning-Based Stock Prediction Using Sentiment Analysis
 emoji: 🔮
 colorFrom: blue
 colorTo: indigo
-sdk: streamlit
-app_file: dashboard/app.py
+sdk: docker
 pinned: false
 license: apache-2.0
 ---
