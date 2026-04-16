@@ -5,8 +5,14 @@ import os
 from src.data.preprocessing import Preprocessor
 
 class Predictor:
-    def __init__(self, model_dir="models"):
-        self.model_dir = model_dir
+    def __init__(self, model_dir=None):
+        # Dynamically find the project root to avoid path issues
+        if model_dir is None:
+            base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+            self.model_dir = os.path.join(base_dir, "models")
+        else:
+            self.model_dir = model_dir
+            
         self.preprocessor = Preprocessor()
 
     def get_latest_data(self, symbol):
