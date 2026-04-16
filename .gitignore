@@ -41,7 +41,7 @@ ENV/
 # Model Files
 # =========================
 *.pkl
-*.joblib
+# *.joblib  <-- Whitelisted for deployment
 *.h5
 *.model
 
