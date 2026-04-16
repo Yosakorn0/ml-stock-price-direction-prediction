@@ -18,11 +18,16 @@ jobs:
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          # Strip offending files physically
-          rm -rf images/ data/raw/ *.ipynb .gitattributes .hfignore
-          # Create a fresh history starting today (removes all record of binary files)
+          # Recursively remove ALL binary images and docs that HF might reject
+          find . -name "*.png" -delete
+          find . -name "*.jpg" -delete
+          find . -name "*.jpeg" -delete
+          find . -name "*.ipynb" -delete
+          rm -rf data/raw/ project_doc/
+          
+          # Create a fresh history starting today
           git checkout --orphan deploy-branch
           git add .
-          git commit -m "Production deployment (history stripped)"
+          git commit -m "Production deployment (all binaries stripped)"
           # Push this NEW history to Hugging Face
           git push --force https://yosakornn:$HF_TOKEN@huggingface.co/spaces/yosakornn/stock-sentiment-analysis deploy-branch:main
