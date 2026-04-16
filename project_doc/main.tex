@@ -80,21 +80,16 @@
     \include{9 - conclusion}
 
     % -------------------- Back Matter --------------------
-    % \include{declaration}
-    % \include{loft}
-
-    \newpage\pagestyle{plain}
-    \include{appendix}
-
-    \pagestyle{plain}  
-    \newpage
+    \cleardoublepage
     \phantomsection
-    
-    % References will automatically create a chapter/section
+    \addcontentsline{toc}{chapter}{References}
     \nocite{*}
-
     \bibliographystyle{apalike}
-    \bibliography{references}  % This generates the references page
+    \bibliography{references}
+
+    \cleardoublepage
+    \pagestyle{plain}
+    \include{appendix}
 
 \end{document}
 

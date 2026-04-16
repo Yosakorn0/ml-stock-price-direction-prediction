@@ -76,11 +76,11 @@ The system evaluates directional accuracy across multiple asset classes using ti
 
 | Asset Symbol | Baseline Accuracy | Precision | Recall | F1-Score |
 | :--- | :--- | :--- | :--- | :--- |
-| **MSFT** (Microsoft) | 0.54 -- 0.58 | 0.52 | 0.61 | 0.56 |
-| **AMZN** (Amazon) | 0.52 -- 0.56 | 0.51 | 0.63 | 0.56 |
-| **GOOGL** (Google) | 0.53 -- 0.57 | 0.53 | 0.59 | 0.55 |
-| **GC=F** (Gold) | 0.50 -- 0.54 | 0.51 | 0.55 | 0.53 |
-| **BTC-USD** (Bitcoin) | 0.51 -- 0.55 | 0.52 | 0.65 | 0.57 |
+| **MSFT** (Microsoft) | 0.48 -- 0.50 | 0.50 | 0.46 | 0.48 |
+| **AMZN** (Amazon) | 0.46 -- 0.48 | 0.48 | 0.32 | 0.38 |
+| **GOOGL** (Google) | 0.47 -- 0.49 | 0.48 | 0.23 | 0.31 |
+| **GC=F** (Gold) | 0.59 -- 0.62 | 0.69 | 0.63 | 0.66 |
+| **BTC-USD** (Bitcoin) | 0.49 -- 0.51 | 0.47 | 0.55 | 0.50 |
 
 > [!NOTE]
 > Performance reflects next-day binary classification (Price Up/Down). Sentiment integration from FinBERT typically provides a 2-3% marginal gain over technical-only models.
