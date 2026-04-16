@@ -1,0 +1,7 @@
+images/
+*.png
+*.jpg
+*.jpeg
+*.joblib
+*.ipynb
+data/raw/

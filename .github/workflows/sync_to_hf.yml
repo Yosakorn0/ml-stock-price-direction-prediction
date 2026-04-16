@@ -16,4 +16,9 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          rm -rf images/ data/raw/ *.ipynb
+          git add .
+          git commit -m "Strip binaries for Hugging Face deployment" || echo "No changes to commit"
           git push --force https://yosakornn:$HF_TOKEN@huggingface.co/spaces/yosakornn/stock-sentiment-analysis main
