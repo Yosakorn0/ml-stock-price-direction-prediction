@@ -1,17 +1,26 @@
-yfinance
+# Core Data handling
+yfinance==0.2.36
 pandas==2.1.4
 pandas-datareader==0.10.0
-numpy
+numpy==1.26.4
+
+# API & Environment
 finnhub-python
 requests
 python-dotenv
+
+# Visualization
 plotly
+matplotlib
+
+# Machine Learning & NLP
 transformers
-torch
-torchvision
+torch --index-url https://download.pytorch.org/whl/cpu
 xgboost
 scikit-learn
 joblib
-streamlit
 shap
-matplotlib
+
+# Web Interface
+streamlit==1.31.0
+watchdog
