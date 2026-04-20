@@ -33,21 +33,21 @@ class DataIngestion:
         symbols = symbols or list(SYMBOLS.keys())
         print(f"Fetching market data for: {symbols} from {self.start_date} to {self.end_date}")
         
-        # Using Ticker.history is often more robust than yf.download for single tickers
+        # Using Ticker.history with period is the most robust method in yfinance
         if len(symbols) == 1:
             try:
                 ticker = yf.Ticker(symbols[0], session=SESSION)
-                data = ticker.history(start=self.start_date, end=self.end_date)
+                data = ticker.history(period="1y", interval="1d", auto_adjust=True)
                 if data.empty:
-                    # Fallback to download if history is empty
-                    data = yf.download(symbols[0], start=self.start_date, end=self.end_date, progress=False, session=SESSION)
+                    # Fallback to download with a fixed range if period fails
+                    data = yf.download(symbols[0], period="1y", interval="1d", progress=False, session=SESSION)
                 return data
             except Exception as e:
                 print(f"Error with Ticker.history for {symbols[0]}: {e}")
-                return yf.download(symbols, start=self.start_date, end=self.end_date, progress=False, session=SESSION)
+                return yf.download(symbols, period="1y", interval="1d", progress=False, session=SESSION)
         
-        # For multiple symbols, use download with progress=False
-        return yf.download(symbols, start=self.start_date, end=self.end_date, progress=False, session=SESSION)
+        # For multiple symbols, use period="1y" as well
+        return yf.download(symbols, period="1y", interval="1d", progress=False, session=SESSION)
 
     def fetch_macro_data(self, indicators=None):
         """Fetch macroeconomic data from FRED."""
