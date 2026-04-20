@@ -35,6 +35,10 @@ class TechnicalFeatures:
         if df.empty:
             return df
             
+        # Hard check for 'Close' column existence and validity
+        if 'Close' not in df.columns or df['Close'].dropna().empty:
+            return df
+            
         # Assuming df has 'Close', 'High', 'Low', 'Volume' columns
         # If it's a MultiIndex (multiple assets), we apply per asset
         

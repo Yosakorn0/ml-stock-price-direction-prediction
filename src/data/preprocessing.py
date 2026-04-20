@@ -23,8 +23,8 @@ class Preprocessor:
         # 1. Fetch market data
         market_data = self.ingestor.fetch_market_data([symbol])
         
-        if market_data.empty or market_data['Close'].isna().all():
-            raise DataFetchError(f"Market data for {symbol} currently unavailable (it may be a holiday or the ticker is invalid).")
+        if market_data.empty or market_data['Close'].dropna().shape[0] < 2:
+            raise DataFetchError(f"Insufficient market data for {symbol} (need at least 2 days of valid prices).")
             
         # Handle MultiIndex if necessary
         if isinstance(market_data.columns, pd.MultiIndex):
