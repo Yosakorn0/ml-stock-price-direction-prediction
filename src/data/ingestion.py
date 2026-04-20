@@ -78,10 +78,40 @@ class DataIngestion:
         try:
             print(f"Strategy C: yf.download (Default settings) for {symbols}")
             data = yf.download(symbols, period="1y", interval="1d", progress=False)
-            if not data.empty:
+            if not data.empty and (isinstance(data.columns, pd.MultiIndex) or data['Close'].dropna().shape[0] >= 2):
                 return data
         except Exception as e:
             print(f"Strategy C failed: {e}")
+
+        # Strategy D: Stooq (Fail-Safe) - Works when Yahoo is completely blocked
+        try:
+            print(f"Strategy D: Stooq Fail-Safe for {symbols}")
+            import pandas_datareader.data as web
+            all_stooq_data = []
+            
+            for s in (symbols if isinstance(symbols, list) else [symbols]):
+                # Stooq doesn't use the same suffixes as Yahoo for some assets
+                stooq_symbol = s.replace("-USD", "").replace("=F", "")
+                try:
+                    s_data = web.DataReader(stooq_symbol, 'stooq', start='2024-01-01')
+                    if not s_data.empty:
+                        # Stooq returns data in descending order, we need ascending
+                        s_data = s_data.sort_index()
+                        # Standardize columns to capitalized 
+                        rename_map = {col: col.capitalize() for col in s_data.columns}
+                        s_data = s_data.rename(columns=rename_map)
+                        if len(symbols) == 1:
+                            return s_data
+                        all_stooq_data.append(s_data)
+                except Exception as stooq_e:
+                    print(f"Stooq failed for {stooq_symbol}: {stooq_e}")
+            
+            if all_stooq_data:
+                # Basic combine if multiple symbols (simplified for this context)
+                return pd.concat(all_stooq_data, axis=1) if len(all_stooq_data) > 1 else all_stooq_data[0]
+                
+        except Exception as e:
+            print(f"Strategy D failed: {e}")
 
         return pd.DataFrame()
 
