@@ -6,10 +6,20 @@ from datetime import datetime
 from dotenv import load_dotenv
 import requests
 
-# Fix: Custom headers to prevent "No timezone found" / Bot protection in yfinance
-USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-SESSION = requests.Session()
-SESSION.headers.update({'User-Agent': USER_AGENT})
+import random
+
+# Fix: Aggressive User-Agent rotation for cloud stability
+USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0"
+]
+
+def get_session():
+    session = requests.Session()
+    session.headers.update({'User-Agent': random.choice(USER_AGENTS)})
+    return session
 
 load_dotenv(".env.local")
 
@@ -29,42 +39,50 @@ class DataIngestion:
         self.end_date = end_date or datetime.now().strftime("%Y-%m-%d")
         
     def fetch_market_data(self, symbols=None):
-        """Fetch market data with aggressive fallback mechanisms."""
+        """Fetch market data with ultra-robust fallback mechanisms."""
         symbols = symbols or list(SYMBOLS.keys())
+        import time
         
-        # Strategy A: yf.download (Preferred for bulk and cloud stability)
-        try:
-            print(f"Strategy A: yf.download (session headers) for {symbols}")
-            data = yf.download(symbols, period="1y", interval="1d", progress=False, session=SESSION, timeout=10)
-            if not data.empty and data['Close'].dropna().shape[0] >= 2:
-                return data
-        except Exception as e:
-            print(f"Strategy A failed: {e}")
-
-        # Strategy B: yf.Ticker.history (Fallback for single symbols)
+        # Strategy A: Use single-ticker string (Often bypasses list-based blocking)
         if len(symbols) == 1:
             try:
-                print(f"Strategy B: yf.Ticker.history (rotated headers) for {symbols[0]}")
-                # Use a specific rotation of headers
-                ALT_SESSION = requests.Session()
-                ALT_SESSION.headers.update({'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'})
-                ticker = yf.Ticker(symbols[0], session=ALT_SESSION)
-                data = ticker.history(period="1y", interval="1d", auto_adjust=True, timeout=10)
+                s = symbols[0]
+                print(f"Strategy A: Ticker.history (string) for {s}")
+                sess = get_session()
+                ticker = yf.Ticker(s, session=sess)
+                data = ticker.history(period="1y", interval="1d", auto_adjust=True)
                 if not data.empty and data['Close'].dropna().shape[0] >= 2:
                     return data
             except Exception as e:
-                print(f"Strategy B failed: {e}")
+                print(f"Strategy A failed: {e}")
+            
+            time.sleep(1) # Small delay to reset connection
 
-        # Strategy C: yf.download (NO custom session - let yfinance use internal defaults)
+        # Strategy B: yf.download with randomized session
         try:
-            print(f"Strategy C: yf.download (default library settings) for {symbols}")
-            data = yf.download(symbols, period="1y", interval="1d", progress=False, timeout=15)
-            if not data.empty and (isinstance(data.columns, pd.MultiIndex) or data['Close'].dropna().shape[0] >= 2):
+            print(f"Strategy B: yf.download (random session) for {symbols}")
+            sess = get_session()
+            data = yf.download(symbols, period="1y", interval="1d", progress=False, session=sess)
+            if not data.empty:
+                # Basic check for at least 2 rows of data
+                if isinstance(data.columns, pd.MultiIndex):
+                    return data
+                elif data['Close'].dropna().shape[0] >= 2:
+                    return data
+        except Exception as e:
+            print(f"Strategy B failed: {e}")
+
+        time.sleep(1)
+
+        # Strategy C: Raw yf.download (No custom session - uses library defaults)
+        try:
+            print(f"Strategy C: yf.download (Default settings) for {symbols}")
+            data = yf.download(symbols, period="1y", interval="1d", progress=False)
+            if not data.empty:
                 return data
         except Exception as e:
             print(f"Strategy C failed: {e}")
 
-        # If all fail, return empty but let preprocessing handle the error
         return pd.DataFrame()
 
     def fetch_macro_data(self, indicators=None):
