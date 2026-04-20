@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import requests
 
 import random
+import finnhub
 
 # Fix: Aggressive User-Agent rotation for cloud stability
 USER_AGENTS = [
@@ -23,6 +24,9 @@ def get_session():
 
 load_dotenv(".env.local")
 
+# Authenticated Clients
+FINNHUB_CLIENT = finnhub.Client(api_key=os.getenv("FINNHUB_API_KEY"))
+
 SYMBOLS = {
     'MSFT': 'Microsoft',
     'AMZN': 'Amazon',
@@ -38,11 +42,49 @@ class DataIngestion:
         self.start_date = start_date
         self.end_date = end_date or datetime.now().strftime("%Y-%m-%d")
         
+    def fetch_finnhub_data(self, symbol):
+        """Authenticated fetch using Finnhub API."""
+        try:
+            import time
+            print(f"Strategy 0: Finnhub (Authenticated) for {symbol}")
+            
+            # Map symbol for Finnhub
+            fh_symbol = symbol.replace("-USD", "USDT")
+            if "USDT" in fh_symbol and ":" not in fh_symbol:
+                fh_symbol = f"BINANCE:{fh_symbol}"
+            elif symbol == "GC=F":
+                fh_symbol = "OANDA:XAU_USD"
+            
+            # 30 days back in unix timestamp
+            to_ts = int(time.time())
+            from_ts = to_ts - (365 * 24 * 3600)
+            
+            res = FINNHUB_CLIENT.stock_candles(fh_symbol, 'D', from_ts, to_ts)
+            
+            if res['s'] == 'ok':
+                df = pd.DataFrame({
+                    'Open': res['o'],
+                    'High': res['h'],
+                    'Low': res['l'],
+                    'Close': res['c'],
+                    'Volume': res['v']
+                }, index=pd.to_datetime(res['t'], unit='s'))
+                return df
+        except Exception as e:
+            print(f"Finnhub failed for {symbol}: {e}")
+        return pd.DataFrame()
+
     def fetch_market_data(self, symbols=None):
         """Fetch market data with ultra-robust fallback mechanisms."""
         symbols = symbols or list(SYMBOLS.keys())
         import time
         
+        # Strategy 0: Finnhub (Authenticated) - ONLY for single symbol requests
+        if len(symbols) == 1:
+            fh_data = self.fetch_finnhub_data(symbols[0])
+            if not fh_data.empty and fh_data['Close'].dropna().shape[0] >= 2:
+                return fh_data
+
         # Strategy A: Use single-ticker string (Often bypasses list-based blocking)
         if len(symbols) == 1:
             try:
