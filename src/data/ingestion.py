@@ -154,10 +154,9 @@ class DataIngestion:
                 except Exception as stooq_e:
                     print(f"Stooq failed for {stooq_symbol}: {stooq_e}")
             
-            if all_stooq_data:
-                # Basic combine if multiple symbols (simplified for this context)
-                return pd.concat(all_stooq_data, axis=1) if len(all_stooq_data) > 1 else all_stooq_data[0]
-                
+        except Exception as e:
+            print(f"Strategy D failed: {e}")
+
         # Strategy E: 5-Day Pulse (Yahoo Short-term) - Last resort scraping
         try:
             print(f"Strategy E: yf.download (5-Day Pulse) for {symbols}")
