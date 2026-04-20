@@ -62,12 +62,18 @@ class DataIngestion:
             if "USDT" in fh_symbol and ":" not in fh_symbol:
                 fh_symbol = f"BINANCE:{fh_symbol}"
             elif symbol == "GC=F":
+                # Gold is tricky in Finnhub; try OANDA or just GC=F
                 fh_symbol = "OANDA:XAU_USD"
             
             to_ts = int(time.time())
-            from_ts = to_ts - (90 * 24 * 3600) # Shorten to 90 days for better free-tier response
+            from_ts = to_ts - (90 * 24 * 3600)
             
             res = FINNHUB_CLIENT.stock_candles(fh_symbol, 'D', from_ts, to_ts)
+            
+            # Fallback for Gold if OANDA fails
+            if res['s'] != 'ok' and symbol == "GC=F":
+                fh_symbol = "GC=F"
+                res = FINNHUB_CLIENT.stock_candles(fh_symbol, 'D', from_ts, to_ts)
             
             if res['s'] == 'ok':
                 df = pd.DataFrame({
@@ -99,6 +105,9 @@ class DataIngestion:
             
             # Map symbol for Alpha Vantage
             av_symbol = symbol.replace("-USD", "")
+            if symbol == "GC=F":
+                av_symbol = "GLD" # Use Gold ETF as Alpha Vantage futures mapping is volatile
+                
             url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={av_symbol}&apikey={av_key}&outputsize=compact'
             r = requests.get(url, timeout=10)
             data = r.json()
