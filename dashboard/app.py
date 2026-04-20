@@ -148,8 +148,12 @@ with st.sidebar:
     status_col1, status_col2 = st.columns(2)
     status_col1.caption("Model Version")
     status_col1.write("**XGB-2.1.wfv**")
-    status_col2.caption("API Connectivity")
-    status_col2.write("🟢 **ACTIVE**")
+    status_col2.caption("Data Provider")
+    fh_key_loaded = os.getenv("FINNHUB_API_KEY") is not None
+    if fh_key_loaded:
+        status_col2.write("🟢 **AUTHORIZED**")
+    else:
+        status_col2.write("🟡 **LIMITED**")
     
     st.markdown("---")
     st.subheader("📉 Backtest Validation")

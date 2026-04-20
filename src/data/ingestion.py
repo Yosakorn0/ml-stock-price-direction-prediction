@@ -25,7 +25,13 @@ def get_session():
 load_dotenv(".env.local")
 
 # Authenticated Clients
-FINNHUB_CLIENT = finnhub.Client(api_key=os.getenv("FINNHUB_API_KEY"))
+fh_key = os.getenv("FINNHUB_API_KEY")
+if fh_key:
+    print("Priority A: Finnhub Key detected. Authenticated ingestion enabled.")
+    FINNHUB_CLIENT = finnhub.Client(api_key=fh_key)
+else:
+    print("Warning: FINNHUB_API_KEY missing. App running in unauthenticated 'Public' mode.")
+    FINNHUB_CLIENT = None
 
 SYMBOLS = {
     'MSFT': 'Microsoft',
@@ -152,8 +158,14 @@ class DataIngestion:
                 # Basic combine if multiple symbols (simplified for this context)
                 return pd.concat(all_stooq_data, axis=1) if len(all_stooq_data) > 1 else all_stooq_data[0]
                 
+        # Strategy E: 5-Day Pulse (Yahoo Short-term) - Last resort scraping
+        try:
+            print(f"Strategy E: yf.download (5-Day Pulse) for {symbols}")
+            data = yf.download(symbols, period="5d", interval="1d", progress=False)
+            if not data.empty and (isinstance(data.columns, pd.MultiIndex) or data['Close'].dropna().shape[0] >= 2):
+                return data
         except Exception as e:
-            print(f"Strategy D failed: {e}")
+            print(f"Strategy E failed: {e}")
 
         return pd.DataFrame()
 
