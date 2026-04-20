@@ -47,12 +47,15 @@ class DataIngestion:
     def __init__(self, start_date="2024-01-01", end_date=None):
         self.start_date = start_date
         self.end_date = end_date or datetime.now().strftime("%Y-%m-%d")
+        self.last_status = [] # For diagnostic reporting
         
     def fetch_finnhub_data(self, symbol):
         """Authenticated fetch using Finnhub API."""
         try:
             import time
-            print(f"Strategy 0: Finnhub (Authenticated) for {symbol}")
+            msg = f"Strategy 0 (Finnhub): Attempting {symbol}"
+            print(msg)
+            self.last_status.append(msg)
             
             # Map symbol for Finnhub
             fh_symbol = symbol.replace("-USD", "USDT")
@@ -61,9 +64,8 @@ class DataIngestion:
             elif symbol == "GC=F":
                 fh_symbol = "OANDA:XAU_USD"
             
-            # 30 days back in unix timestamp
             to_ts = int(time.time())
-            from_ts = to_ts - (365 * 24 * 3600)
+            from_ts = to_ts - (90 * 24 * 3600) # Shorten to 90 days for better free-tier response
             
             res = FINNHUB_CLIENT.stock_candles(fh_symbol, 'D', from_ts, to_ts)
             
@@ -75,23 +77,30 @@ class DataIngestion:
                     'Close': res['c'],
                     'Volume': res['v']
                 }, index=pd.to_datetime(res['t'], unit='s'))
+                self.last_status.append(f"Strategy 0 (Finnhub): SUCCESS ({len(df)} rows)")
                 return df
+            else:
+                self.last_status.append(f"Strategy 0 (Finnhub): FAILED status={res['s']}")
         except Exception as e:
-            print(f"Finnhub failed for {symbol}: {e}")
+            self.last_status.append(f"Strategy 0 (Finnhub): ERROR {str(e)}")
         return pd.DataFrame()
 
     def fetch_alpha_vantage_data(self, symbol):
         """Authenticated fetch using Alpha Vantage API."""
         try:
-            print(f"Strategy 1: Alpha Vantage (Authenticated) for {symbol}")
+            msg = f"Strategy 1 (AlphaVantage): Attempting {symbol}"
+            print(msg)
+            self.last_status.append(msg)
+            
             av_key = os.getenv("ALPHA_VANTAGE_API_KEY")
             if not av_key:
+                self.last_status.append("Strategy 1 (AlphaVantage): SKIP (No Key)")
                 return pd.DataFrame()
             
             # Map symbol for Alpha Vantage
-            av_symbol = symbol.replace("-USD", "USD")
+            av_symbol = symbol.replace("-USD", "")
             url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={av_symbol}&apikey={av_key}&outputsize=compact'
-            r = requests.get(url)
+            r = requests.get(url, timeout=10)
             data = r.json()
             
             if "Time Series (Daily)" in data:
@@ -101,15 +110,18 @@ class DataIngestion:
                 df = df.astype(float)
                 df.index = pd.to_datetime(df.index)
                 df = df.sort_index()
+                self.last_status.append(f"Strategy 1 (AlphaVantage): SUCCESS ({len(df)} rows)")
                 return df
             else:
-                print(f"Alpha Vantage error for {symbol}: {data.get('Note', 'Unknown Error')}")
+                note = data.get('Note', data.get('Information', 'Unknown Error'))
+                self.last_status.append(f"Strategy 1 (AlphaVantage): FAILED msg={note[:50]}")
         except Exception as e:
-            print(f"Alpha Vantage failed for {symbol}: {e}")
+            self.last_status.append(f"Strategy 1 (AlphaVantage): ERROR {str(e)}")
         return pd.DataFrame()
 
     def fetch_market_data(self, symbols=None):
         """Fetch market data with ultra-robust fallback mechanisms."""
+        self.last_status = [] # Reset for new request
         symbols = symbols or list(SYMBOLS.keys())
         import time
         
@@ -118,24 +130,18 @@ class DataIngestion:
             try:
                 fh_data = self.fetch_finnhub_data(symbols[0])
                 if not fh_data.empty and fh_data['Close'].dropna().shape[0] >= 2:
-                    print(f"Strategy 0 (Finnhub) SUCCESS for {symbols[0]}: {len(fh_data)} rows")
                     return fh_data
-                else:
-                    print(f"Strategy 0 (Finnhub) EMPTY for {symbols[0]}")
             except Exception as e:
-                print(f"Strategy 0 (Finnhub) CRASHED: {e}")
+                print(f"Strategy 0 failed: {e}")
 
         # Strategy 1: Alpha Vantage (Authenticated)
         if len(symbols) == 1:
             try:
                 av_data = self.fetch_alpha_vantage_data(symbols[0])
                 if not av_data.empty and av_data['Close'].dropna().shape[0] >= 2:
-                    print(f"Strategy 1 (Alpha Vantage) SUCCESS for {symbols[0]}: {len(av_data)} rows")
                     return av_data
-                else:
-                    print(f"Strategy 1 (Alpha Vantage) EMPTY for {symbols[0]}")
             except Exception as e:
-                print(f"Strategy 1 (Alpha Vantage) CRASHED: {e}")
+                print(f"Strategy 1 failed: {e}")
 
         # Strategy A: Use single-ticker string (Often bypasses list-based blocking)
         if len(symbols) == 1:

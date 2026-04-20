@@ -70,7 +70,7 @@ The project normalizes and aligns data from disparate sources:
 - **Interpretability**: **SHAP (Shapley Additive Explanations)** for feature importance analysis.
 - **Evaluation**: Accuracy, Precision, Recall, and **Annualized Sharpe Ratio** (including 0.1% transaction cost).
 
-## 📊 Model Performance Summary
+## 📊 Model Performance Summarys
 
 The system evaluates directional accuracy across multiple asset classes using time-series walk-forward validation.
 

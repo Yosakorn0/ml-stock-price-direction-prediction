@@ -157,8 +157,25 @@ with st.sidebar:
     
     st.markdown("---")
     st.subheader("📉 Backtest Validation")
-    st.caption("Out-of-Sample Sharpe (Net of 0.1% Friction)")
+    st.caption("Out-of-Sample (Net of 0.1% Friction)")
     
+    # Live Diagnostics Console
+    with st.expander("📡 Connection Logs", expanded=False):
+        if predictor and hasattr(predictor.preprocessor.ingestor, 'last_status'):
+            logs = predictor.preprocessor.ingestor.last_status
+            if logs:
+                for log in logs:
+                    if "SUCCESS" in log:
+                        st.success(log)
+                    elif "FAILED" in log or "ERROR" in log:
+                        st.error(log)
+                    else:
+                        st.info(log)
+            else:
+                st.write("No recent activity.")
+        else:
+            st.write("Initializing console...")
+
     performance_data = {
         "Asset": ["Gold", "MSFT", "GOOGL", "AMZN", "BTC"],
         "Sharpe": [1.49, -0.26, -0.01, -0.71, -0.78]
