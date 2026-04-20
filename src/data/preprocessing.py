@@ -5,6 +5,10 @@ from src.data.ingestion import DataIngestion
 from src.data.sentiment import SentimentAnalyzer
 from src.features.technical import TechnicalFeatures
 
+class DataFetchError(Exception):
+    """Custom exception when market data fetch fails or returns empty."""
+    pass
+
 class Preprocessor:
     def __init__(self, symbols=None):
         self.symbols = symbols or ['MSFT', 'AMZN', 'GOOGL', 'GC=F', 'BTC-USD']
@@ -19,6 +23,9 @@ class Preprocessor:
         # 1. Fetch market data
         market_data = self.ingestor.fetch_market_data([symbol])
         
+        if market_data.empty or market_data['Close'].isna().all():
+            raise DataFetchError(f"Market data for {symbol} currently unavailable (it may be a holiday or the ticker is invalid).")
+            
         # Handle MultiIndex if necessary
         if isinstance(market_data.columns, pd.MultiIndex):
             market_data.columns = market_data.columns.get_level_values(0)

@@ -1,5 +1,5 @@
 # Core Data handling
-yfinance==0.2.36
+yfinance==0.2.43
 pandas==2.1.4
 pandas-datareader==0.10.0
 numpy==1.26.4
@@ -12,10 +12,13 @@ python-dotenv
 # Visualization
 plotly
 matplotlib
+lxml
+cryptography
 
 # Machine Learning & NLP
 transformers
 torch --index-url https://download.pytorch.org/whl/cpu
+torchvision --index-url https://download.pytorch.org/whl/cpu
 xgboost
 scikit-learn
 joblib
@@ -24,3 +27,4 @@ shap
 # Web Interface
 streamlit==1.31.0
 watchdog
+prometheus-client

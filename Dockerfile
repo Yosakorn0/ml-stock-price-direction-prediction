@@ -24,8 +24,8 @@ RUN pip install --no-cache-dir --user -r requirements.txt
 # Copy the rest of the application
 COPY --chown=user . .
 
-# Hugging Face Spaces default port
-EXPOSE 7860
+# Hugging Face Spaces default port and Prometheus metrics port
+EXPOSE 7860 8000
 
 # Command to run the dashboard by default
 CMD ["streamlit", "run", "dashboard/app.py", "--server.port=7860", "--server.address=0.0.0.0"]

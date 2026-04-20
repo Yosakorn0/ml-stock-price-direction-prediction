@@ -1,0 +1,106 @@
+\chapter{INTRODUCTION}
+\section {Background of the Study}
+
+Modern financial markets rely on microseconds of latency and distributed architectures to provide real-time pricing and news to traders and algorithms. From trading platforms to financial dashboards, real-time data ingestion and aggregation are critical requirements. These systems depend on robust Internet protocols like HTTP/2, WebSocket, and secure transport layers like TCP with TLS.
+
+Many academic projects focus on generic data systems without demonstrating the high-concurrency and low-latency requirements of financial technology. This study aims to bridge that gap by designing and implementing a Real-Time Financial Data Monitoring and News Aggregation System that integrates real-world market feeds from the Yahoo Finance API and a interface to provide an optimized monitoring experience.
+
+%=================== STATEMENT OF THE PROBLEM ===================%
+Traditional financial data systems often suffer from significant latency when relying on legacy request-response models like HTTP polling, which can lead to outdated information and missed market opportunities. Furthermore, the sensitive nature of financial data requires rigorous security at multiple protocol layers to prevent unauthorized access, data tampering, and interception.
+
+There is a need for a financial monitoring system that:
+
+\begin{itemize}
+    \item Supports sub-second bidirectional communication for live price updates,
+    \item Demonstrates efficient interaction between application, transport, and network layers,
+    \item Aggregates disparate data sources (prices and news) into a unified secure stream,
+    \item Integrates Machine Learning for real-time sentiment analysis of financial news,
+    \item Implements robust security using JWT and TLS to protect market data.
+\end{itemize}
+
+This project addresses these challenges by developing a high-performance, real-time financial monitoring system built upon layered Internet protocol principles.
+
+%=================== OBJECTIVES ===================%
+The primary objective of this project is to design and implement a secure, scalable, and real-time financial monitoring and news aggregation system using real-world data from Yahoo Finance, demonstrating practical integration of modern Internet protocol layers.
+
+The specific objectives are:
+
+\begin{enumerate}
+    \item To implement real-time stock price streaming using Yahoo Finance data via WebSocket-based push communication.
+    \item To develop a news aggregation service that fetches and processes financial updates via REST APIs.
+    \item To integrate a Machine Learning module for automated sentiment analysis of financial headlines.
+    \item To analyze the correlation between news sentiment scores and real-time stock price movements.
+    \item To utilize a relational database for persistent storage of market events, news, and sentiment data.
+    \item To demonstrate the interaction between application-layer (HTTP/WS), transport-layer (TCP), and network-layer protocols in a financial context.
+    \item To integrate enterprise-level security including TLS encryption and JWT-based authentication.
+    \item To evaluate the efficiency of WebSocket streaming versus traditional polling in high-frequency financial updates.
+\end{enumerate}
+
+%=================== TARGET USER ===================%
+\section{Target Users and Requirements}
+
+\subsection{Target Users}
+The primary target users of this system include:
+
+\begin{itemize}
+    \item \textbf{Individual Traders}: Require low-latency visibility into market volatility and price direction for timely execution.
+    \item \textbf{Financial Researchers}: Need aggregated data from distributed sources to study news-price correlation using Machine Learning.
+    \item \textbf{Network Analysts}: Interested in the performance of multi-layer protocol stacks in high-concurrency fintech scenarios.
+\end{itemize}
+
+\subsection{Requirements Mapping}
+
+The following table maps user needs to the technical system requirements implemented via Internet technologies:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|p{0.45\textwidth}|p{0.45\textwidth}|}
+\hline
+\textbf{User Requirement} & \textbf{System Requirement} \\ \hline
+Real-time, sub-second price monitoring & Full-Duplex \textbf{WebSocket} over TCP for low-latency bidirectional streaming. \\ \hline
+Access to global financial news sentiment & Integration of RESTful API calls over \textbf{HTTPS} with asynchronous data processing. \\ \hline
+Data security and privacy of transmission & Deployment of \textbf{TLS 1.3} encryption layer with JWT-based session management. \\ \hline
+Remote access from any network location & Cloud deployment via \textbf{Hugging Face/Docker} with IPv4 addressing and DNS resolution. \\ \hline
+\end{tabular}
+\caption{User vs. System Requirements Mapping}
+\label{tab:requirements_mapping}
+\end{table}
+
+The platform is designed with a performance-oriented perspective, making it particularly relevant to companies operating in algorithmic trading, market data distribution, and real-time financial analytics.
+
+%=================== SCOPE OF THE PROJECT ===================%
+\section{Scope of the Project}
+
+
+This project focuses on the design and implementation of a secure, Real-Time Financial Data Monitoring and News Aggregation System that demonstrates multi-layer Internet protocol interaction within a practical system architecture, utilizing the Yahoo Finance API for live market data. The scope of the project is divided into core functional features and architectural components.
+
+\subsection{Core Features}
+
+The core functional features of the system include:
+
+\begin{itemize}
+    \item \textbf{Financial Data Ingestion:} Continuous streaming of tick data and news from external market APIs.
+    \item \textbf{Real-Time WebSocket Ticker:} Seamless client-server communication using a Solarized Light interface for live price updates.
+    \item \textbf{ML Sentiment Analysis:} Automated scoring of financial news using Natural Language Processing (NLP).
+    \item \textbf{Sentiment-Price Correlation:} Analytical tools to study the relationship between news sentiment and market reaction.
+    \item \textbf{Persistent Market History:} Storage of historical price movements and sentiment scores in a relational database.
+    \item \textbf{Secure Authentication:} Multi-layer user access protection using JWT-based mechanisms.
+    \item \textbf{Encrypted Data Routing:} Secure traffic management via an Nginx reverse proxy with TLS support.
+\end{itemize}
+
+\subsection{Architectural Scope}
+
+The architectural scope defines the system boundaries and protocol-layer interactions:
+
+\begin{itemize}
+    \item \textbf{Application Layer:} Implementation of HTTP/HTTPS and WebSocket protocols for communication between distributed components.
+    \item \textbf{Transport Layer:} Reliable data transmission using TCP, ensuring ordered and error-checked delivery.
+    \item \textbf{Security Layer:} Integration of TLS encryption to provide confidentiality and integrity of transmitted data.
+    \item \textbf{Network Layer:} Use of IPv4/IPv6 addressing and routing to enable distributed connectivity.
+    \item \textbf{Containerized Deployment:} Service isolation and deployment using Docker containers.
+    \item \textbf{Reverse Proxy Configuration:} Use of a reverse proxy server to manage traffic routing and secure external access.
+    \item \textbf{Performance and Security Evaluation:} Measurement of latency, throughput, and system robustness under simulated workloads.
+\end{itemize}
+
+The project does not include large-scale distributed orchestration across multiple cloud regions, advanced consensus protocols, or enterprise-level fault tolerance mechanisms. Instead, it delivers a production-oriented prototype that clearly demonstrates layered Internet protocol interactions and secure real-time financial data processing within a manageable academic scope.

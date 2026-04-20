@@ -1,0 +1,108 @@
+\documentclass[12pt,a4paper]{report}
+
+% -------------------- Packages --------------------
+\usepackage{svg}
+\usepackage{amsmath,amssymb}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{apacite}  % APA citation style
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{tcolorbox}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{setspace}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{titlesec}
+
+\setstretch{1.5}
+
+% -------------------- Code Block Styling --------------------
+\lstset{
+  breaklines=true,
+  basicstyle=\footnotesize\ttfamily,
+  lineskip=0.5ex
+}
+\tcbuselibrary{listingsutf8}
+\tcolorboxenvironment{lstlisting}{
+  colback=gray!5!white,
+  colframe=gray!80!black,
+  boxrule=0.5pt,
+  arc=3pt
+}
+
+% -------------------- Chapter & Section Formatting --------------------
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries\centering}
+  {\large\MakeUppercase{CHAPTER \thechapter}}
+  {1ex}
+  {\large\MakeUppercase}
+\titlespacing*{\chapter}{0pt}{-10pt}{20pt}
+
+\titleformat{\section}
+  {\bfseries\normalsize}
+  {\thesection\quad}
+  {0em}
+  {}
+
+\titleformat{\subsection}
+  {\bfseries\normalsize}
+  {\thesubsection\quad}
+  {0em}
+  {}
+
+% -------------------- Bibliography Style --------------------
+\bibliographystyle{apacite}
+
+% ==============================================================
+\begin{document}
+
+% -------------------- Front Matter --------------------
+\pagenumbering{roman}
+\addtocontents{toc}{~\hfill\textbf{Page}\par}
+
+\include{0-cover}
+\include{1-abstract}
+
+% -------------------- Table of Contents --------------------
+\clearpage
+\phantomsection
+\renewcommand{\contentsname}{\bfseries Table of Contents}
+\tableofcontents
+
+% -------------------- Main Content --------------------
+\cleardoublepage
+\pagenumbering{arabic}
+
+\include{2-introduction}
+\include{3-literature}
+\include{4-methodology}
+\include{5-results}
+\include{6-conclusion}
+
+% -------------------- Back Matter --------------------
+\cleardoublepage
+\include{declaration}
+\include{loft}
+
+% -------------------- References --------------------
+\cleardoublepage
+\phantomsection
+
+% Optional: force all references to show
+% Remove this line later if you only want cited references
+\nocite{*}
+
+\bibliography{reference}
+
+% -------------------- Appendix --------------------
+\cleardoublepage
+\include{appendix}
+\include{appendix_internet}
+
+\end{document}

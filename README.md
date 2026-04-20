@@ -14,7 +14,7 @@ license: apache-2.0
 **Academic Context**:
 
 - **AT82.03**: Machine Learning
-- **AT82.9002**: Selected Topic: Data Engineering and MLOps at AIT
+- **AT82.9002**: Advanced Topic in Internet
 
 ## 🌟 Project Overview
 

@@ -1,4 +1,13 @@
 import streamlit as st
+
+# Page configuration - MUST BE FIRST STREAMLIT COMMAND
+st.set_page_config(
+    page_title="Vortex | Financial Intelligence Dashboard",
+    page_icon="🔮",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
 import pandas as pd
 import plotly.graph_objects as go
 import os
@@ -9,14 +18,30 @@ from datetime import datetime
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.models.predict import Predictor
+import time
+from prometheus_client import start_http_server, Counter, Histogram, Gauge
 
-# Page configuration
-st.set_page_config(
-    page_title="Vortex | Financial Intelligence Dashboard",
-    page_icon="🔮",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+# --- PROMETHEUS METRICS ---
+# Initialize metrics once using Streamlit's cache_resource
+@st.cache_resource
+def get_metrics():
+    try:
+        start_http_server(8000, addr='0.0.0.0')
+    except Exception:
+        pass # Server already running
+        
+    return {
+        'count': Counter('vortex_predictions', 'Total number of stock predictions made', ['symbol', 'prediction']),
+        'latency': Histogram('vortex_inference_latency', 'Time spent processing model inference'),
+        'sentiment': Gauge('vortex_market_sentiment', 'Latest analyzed sentiment score', ['symbol']),
+        'errors': Counter('vortex_errors', 'Total number of system failures', ['type', 'symbol'])
+    }
+
+metrics = get_metrics()
+PREDICTION_COUNT = metrics['count']
+INFERENCE_TIME = metrics['latency']
+SENTIMENT_VAL = metrics['sentiment']
+ERROR_COUNT = metrics['errors']
 
 # --- PREMIUM STYLING ---
 st.markdown("""
@@ -140,7 +165,7 @@ with st.sidebar:
         color = '#00f2fe' if val > 0 else '#ff4b4b'
         return f'color: {color}; font-weight: bold'
 
-    st.table(perf_df.style.applymap(highlight_sharpe, subset=['Sharpe']))
+    st.table(perf_df.style.map(highlight_sharpe, subset=['Sharpe']))
     
     st.info("Core Engine: FinBERT + XGBoost Ensemble")
 
@@ -150,11 +175,25 @@ if st.button("Generate Intelligence Report", use_container_width=True):
         st.error("Predictor engine not initialized. Check your logs.")
     else:
         with st.spinner(f"Synthesizing data for {symbols[selected_symbol]}..."):
+            start_time = time.time()
             result = predictor.predict_direction(selected_symbol)
+            latency = time.time() - start_time
+            INFERENCE_TIME.observe(latency)
             
             if "error" in result:
-                st.error(f"Engine Failure: {result['error']}")
+                error_type = "Market Data" if "Market Data" in result['error'] else "Engine"
+                ERROR_COUNT.labels(type=error_type, symbol=selected_symbol).inc()
+                
+                if "Market Data" in result['error']:
+                    st.warning(f"🕒 **Data Latency Detected:** {result['error']}")
+                    st.info("This often happens during market holidays or due to provider rate limits. Please try again in a few minutes.")
+                else:
+                    st.error(f"⚠️ **Engine failure:** {result['error']}")
             else:
+                # Record Telemetry
+                PREDICTION_COUNT.labels(symbol=selected_symbol, prediction=result['prediction']).inc()
+                SENTIMENT_VAL.labels(symbol=selected_symbol).set(result['sentiment'])
+                
                 # Top Metrics
                 m1, m2, m3, m4 = st.columns(4)
                 

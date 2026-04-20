@@ -32,6 +32,9 @@ class TechnicalFeatures:
 
     def add_all_features(self, df):
         """Add all technical features to the DataFrame."""
+        if df.empty:
+            return df
+            
         # Assuming df has 'Close', 'High', 'Low', 'Volume' columns
         # If it's a MultiIndex (multiple assets), we apply per asset
         

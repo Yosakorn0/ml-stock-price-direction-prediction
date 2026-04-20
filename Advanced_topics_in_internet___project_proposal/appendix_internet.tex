@@ -1,0 +1,41 @@
+\chapter{Technical Network Architecture}
+\label{app:network_arch}
+
+The diagram below illustrates the multi-layer protocol interaction implemented in the system. It highlights how the application flows from external API providers through the Internet stack to the containerized backend and finally to the end-user trading terminal.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=2.5cm,
+    layer/.style={rectangle, draw=black, thick, fill=blue!10, text width=5cm, align=center, minimum height=1.2cm},
+    component/.style={ellipse, draw=teal, thick, fill=teal!5, text width=3cm, align=center},
+    arrow/.style={thick, ->, >=stealth, color=black!70}
+]
+
+% Layers
+\node (app) [layer] {\textbf{Application Layer} \\ (HTTPS, WSS, DNS)};
+\node (trans) [layer, below of=app] {\textbf{Transport Layer} \\ (TCP, TLS 1.3)};
+\node (net) [layer, below of=trans] {\textbf{Network Layer} \\ (IPv4/IPv6, Routing)};
+\node (link) [layer, below of=net] {\textbf{Data Link Layer} \\ (Ethernet, Wi-Fi)};
+
+% Outside Components
+\node (provider) [component, left of=trans, node distance=6cm] {API Providers \\ (Yahoo, Finnhub)};
+\node (user) [component, right of=trans, node distance=6cm] {User Terminal \\ (Browser)};
+
+% Connections
+\draw [arrow] (provider) -- (app) node[midway, above, sloped] {REST/JSON};
+\draw [arrow] (app) -- (trans);
+\draw [arrow] (trans) -- (net);
+\draw [arrow] (net) -- (link);
+\draw [arrow] (app) -- (user) node[midway, above, sloped] {WebSocket};
+
+% Descriptions
+\node [right of=app, node distance=4cm, text width=4cm, font=\footnotesize] {Payload: Market Ticks \& News};
+\node [right of=trans, node distance=4cm, text width=4cm, font=\footnotesize] {Reliability: Handshakes \& ACK};
+
+\end{tikzpicture}
+\caption{Cross-Layer Protocol Interaction Diagram}
+\label{fig:network_stack_flow}
+\end{figure}
+
+As shown in Figure \ref{fig:network_stack_flow}, the system relies on the \textbf{Application Layer} for the semantics of the data (stock prices), while the \textbf{Transport Layer} ensures the reliability required for financial calculations. The \textbf{Network} and \textbf{Data Link} layers provide the physical and logical routing necessary to reach distributed cloud edge locations.

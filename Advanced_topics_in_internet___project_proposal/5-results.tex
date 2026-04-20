@@ -1,0 +1,33 @@
+\chapter{Expected Results}
+
+The implemented system is expected to successfully:
+
+\begin{itemize}
+    \item Ingest high-frequency stock price ticks from the real-world Yahoo Finance API.
+    \item Aggregate and display live financial news headlines in real-time.
+    \item Visualize live price movements on an ergonomic Solarized Light terminal via WebSockets.
+    \item Persists a secure historical log of all market events and price changes.
+    \item Ensure data integrity and access control through JWT and TLS.
+\end{itemize}
+
+System benchmarks aim to achieve sub-500ms latency for price updates from ingestion to visualization under concurrent load.
+
+
+% -------------------------------------------------
+\section{Discussion}
+
+The use of TCP ensures that critical financial ticks are delivered without error, though session overhead must be managed. WebSockets enable the "push" model required for professional trading platforms, avoiding the delays inherent in HTTP polling.
+
+Compared to traditional RESTful updates, the WebSocket-based financial stream reduces client requests by over 90\% and provides instant price discovery.
+
+HTTPS/TLS provides the necessary confidentiality for financial data, ensuring that price feeds and user credentials are safe from man-in-the-middle attacks.
+
+% -------------------------------------------------
+\section{Challenges and Limitations}
+
+\begin{itemize}
+    \item Managing network latency for real-time updates.
+    \item Handling concurrent user connections.
+    \item Database connection management and basic indexing.
+    \item Ensuring consistent data format across distributed components.
+\end{itemize}

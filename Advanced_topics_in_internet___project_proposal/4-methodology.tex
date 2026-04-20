@@ -1,0 +1,121 @@
+\chapter{Methodology}
+
+% -------------------------------------------------
+\section{System Overview}
+
+The system consists of three primary components:
+
+\begin{enumerate}
+    \item \textbf{Financial Terminal Dashboard}: A real-time web interface for traders.
+    \item \textbf{Financial Backend Service}: Handles real-world data ingestion, news aggregation, and security.
+    \item \textbf{Intelligence Module}: Performs ML-based sentiment analysis on news headlines to generate market sentiment scores.
+    \item \textbf{Historical Market Database}: PostgreSQL for persistent storage of market events, news, and sentiment data.
+    \item \textbf{Observability Layer}: A real-time monitoring stack using \textbf{Grafana and Prometheus} to provide visibility into the internet protocol stack.
+\end{enumerate}
+
+The web client communicates with the backend via secure HTTPS and WebSocket protocols. The system receives high-frequency price ticks from the Yahoo Finance API and live news headlines, processes them for aggregation, persists them to the database, and pushes live updates to the terminal.
+
+% -------------------------------------------------
+\section{System Architecture}
+
+The architecture follows a client-server model:
+
+\subsection*{Application Layer (Client Terminal)}
+\begin{itemize}
+    \item User interface for price and news visualization.
+    \item JWT-based secure session management.
+\end{itemize}
+
+\subsection*{Processing Layer (Backend)}
+\begin{itemize}
+    \item Yahoo Finance API Data Ingestion and Normalization.
+    \item Financial News Aggregation Engine.
+    \item \textbf{ML Sentiment Analyzer} (VADER-based NLP).
+    \item WebSocket Real-Time Broadcaster.
+\end{itemize}
+
+\subsection*{Storage Layer (Persistent)}
+\begin{itemize}
+    \item Relational Database (PostgreSQL) for tick and news history.
+    \item Structured indexing for rapid historical retrieval.
+\end{itemize}
+
+% -------------------------------------------------
+\section{Methodology}
+
+The development methodology includes:
+
+\begin{enumerate}
+    \item Requirement analysis for real-time financial data structures.
+    \item Implementation of the Financial Backend Service with ticker processing logic.
+    \item Development of the Yahoo Finance Data Ingestor representing real-world API feeds.
+    \item \textbf{Integration of Natural Language Processing (NLP)} for news sentiment analysis.
+    \item \textbf{Development of correlation algorithms} to study sentiment-price relationships.
+    \item Integration of a relational database for price, news, and sentiment persistence.
+    \item Deployment of a WebSocket-based push system for sub-second updates.
+    \item Security hardening using TLS and JWT-based authentication.
+    \item Performance evaluation of streaming throughput and ML inference latency.
+\end{enumerate}
+
+% -------------------------------------------------
+\section{Network Architecture and Protocol Stack}
+
+The system incorporates protocols from all four layers of the TCP/IP Internet Protocol Suite to ensure reliable, low-latency financial data delivery.
+
+\subsection{Application Layer}
+\begin{itemize}
+    \item \textbf{HTTPS (REST APIs)}: Used for fetching news headlines (Finnhub API) and macroeconomic data (FRED API). TLS 1.3 is enforced to ensure data integrity and confidentiality during ingestion.
+    \item \textbf{WebSocket (WS)}: Implemented for bidirectional, full-duplex communication between the backend and the trading terminal. This minimizes the overhead of HTTP headers during high-frequency stock price updates.
+    \item \textbf{DNS}: Utilized for resolving API provider hostnames (e.g., \texttt{query1.finance.yahoo.com}) into routable IP addresses.
+\end{itemize}
+
+\subsection{Transport Layer}
+\begin{itemize}
+    \item \textbf{TCP}: The fundamental transport protocol for all financial data streams. TCP ensures ordered delivery and retransmission of lost packets—critical for price tickers where missing a tick can invalidate technical indicators.
+    \item \textbf{QUIC (Bonus Target)}: Proposed as a future enhancement for the mobile terminal to reduce latency caused by head-of-line blocking and speed up the TLS handshake.
+\end{itemize}
+
+\subsection{Network Layer}
+\begin{itemize}
+    \item \textbf{IPv4/IPv6}: The system uses standard Internet Protocol addressing for cloud communication. Docker's virtual network bridge maps container IP addresses to the host's network stack.
+    \item \textbf{ICMP}: Used for network diagnostics and to measure round-trip time (RTT) between the ingestion nodes and financial host providers.
+\end{itemize}
+
+\subsection{Data Link / Physical Layer}
+\begin{itemize}
+    \item \textbf{Ethernet / IEEE 802.11 (Wi-Fi)}: The system is designed to operate over standard local area networks. The Docker environment simulates local hop communication through virtualized network interfaces.
+\end{itemize}
+
+% -------------------------------------------------
+\section{Tools and Technologies}
+
+The implementation utilizes a professional-grade tech stack focused on networking efficiency and data science performance:
+
+\begin{itemize}
+    \item \textbf{Programming Language}: Python 3.11 (Selected for its robust networking libraries).
+    \item \textbf{Networking Libraries}: \texttt{requests} (HTTPS), \texttt{websockets} (WS/WSS), \texttt{urllib3}.
+    \item \textbf{Data Infrastructure}: PostgreSQL (Persistent storage), Redis (Proposed for real-time caching).
+    \item \textbf{Virtualization}: Docker and Docker-Compose for network isolation and environment reproducibility.
+    \item \textbf{Monitoring \& Observability}: \textbf{Prometheus} for metrics collection and \textbf{Grafana} for real-time visualization of internet protocol performance.
+    \item \textbf{Intelligence Frameworks}: XGBoost for direction prediction, FinBERT (Hugging Face) for NLP.
+\end{itemize}
+
+% -------------------------------------------------
+\section{Project Timeline (Hypothetical)}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|p{0.7\textwidth}|}
+\hline
+\textbf{Week} & \textbf{Milestones and Deliverables} \\ \hline
+Week 1 & Requirement Analysis, Internet Protocol selection, and System Architecture design. \\ \hline
+Week 2 & Implementation of the Data Ingestion engine (HTTPS/REST) and API integration. \\ \hline
+Week 3 & Development of the Real-Time WebSocket server and client-side streaming logic. \\ \hline
+Week 4 & Training of the XGBoost prediction models and FinBERT sentiment integration. \\ \hline
+Week 5 & Vortex Dashboard development (Streamlit/UI) and Docker containerization. \\ \hline
+Week 6 & Performance evaluation, Security hardening, and Final Technical Report. \\ \hline
+\end{tabular}
+\caption{Hypothetical 6-Week Project Timeline}
+\label{tab:timeline}
+\end{table}

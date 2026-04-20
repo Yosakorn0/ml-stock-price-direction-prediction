@@ -1,0 +1,9 @@
+\chapter{Literature Review}
+
+Real-time financial information systems have evolved from periodic updates to high-frequency streaming platforms where milliseconds determine market advantage. Early systems relied on polling-based HTTP mechanisms, which often resulted in "stale" data that did not reflect true market conditions.
+
+The transition to the WebSocket protocol has been foundational for the fintech industry, enabling persistent, full-duplex communication over single TCP connections \cite{websocket_rfc}. Unlike traditional RESTful polling, WebSockets allow financial servers to push price ticks and news alerts directly to clients, significantly reducing latency and bandwidth consumption in high-volatility scenarios.
+
+Modern financial data aggregation also relies on robust Application Programming Interfaces (APIs). While simulated data provides a baseline, the integration of real-world feeds like the Yahoo Finance API allows for higher fidelity in testing and performance evaluation of low-latency systems. Fielding’s work on RESTful principles remains the standard for fetching structured historical data and news articles efficiently \cite{fielding}. However, the hybrid approach—using REST for management and WebSockets for live streams—is widely recognized as the most effective architecture for comprehensive financial dashboards.
+
+Security and reliability are paramount in high-stakes financial systems. This project evaluates the synergy between application-layer protocols (HTTP/WS), transport reliability (TCP), and security (TLS) within a real-time context, providing a scalable model for live market data processing utilizing professional-grade Solarized Light visualization for human operators.

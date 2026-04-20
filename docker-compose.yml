@@ -5,6 +5,7 @@ services:
     build: .
     ports:
       - "8501:8501"
+      - "8000:8000"
     env_file:
       - .env.local
     environment:
@@ -12,15 +13,43 @@ services:
     volumes:
       - .:/app
     command: streamlit run dashboard/app.py --server.port=8501 --server.address=0.0.0.0
+    networks:
+      - monitoring
 
-  worker:
-    build: .
-    env_file:
-      - .env.local
-    environment:
-      - PYTHONPATH=/app
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
     volumes:
-      - .:/app
-    # The worker can be used to manually run the training/ingestion scripts
-    # e.g., docker-compose run worker python -m src.data.preprocessing
-    command: tail -f /dev/null
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - monitoring
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./infrastructure/grafana/provisioning:/etc/grafana/provisioning
+      - ./infrastructure/grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+    driver: bridge

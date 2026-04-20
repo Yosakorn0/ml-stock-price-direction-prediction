@@ -4,6 +4,12 @@ import pandas_datareader.data as web
 import os
 from datetime import datetime
 from dotenv import load_dotenv
+import requests
+
+# Fix: Custom headers to prevent "No timezone found" / Bot protection in yfinance
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+SESSION = requests.Session()
+SESSION.headers.update({'User-Agent': USER_AGENT})
 
 load_dotenv(".env.local")
 
@@ -18,7 +24,7 @@ SYMBOLS = {
 FRED_INDICATORS = ['FEDFUNDS', 'UNRATE', 'CPIAUCSL'] # Fed Funds, Unemployment, CPI
 
 class DataIngestion:
-    def __init__(self, start_date="2020-01-01", end_date=None):
+    def __init__(self, start_date="2024-01-01", end_date=None):
         self.start_date = start_date
         self.end_date = end_date or datetime.now().strftime("%Y-%m-%d")
         
@@ -26,11 +32,22 @@ class DataIngestion:
         """Fetch historical price data from Yahoo Finance."""
         symbols = symbols or list(SYMBOLS.keys())
         print(f"Fetching market data for: {symbols} from {self.start_date} to {self.end_date}")
-        data = yf.download(symbols, start=self.start_date, end=self.end_date)
         
-        # If multiple symbols, it returns a MultiIndex. Let's flatten or restructure.
-        # For simplicity, we can store them in a dict of DataFrames or a stacked DataFrame.
-        return data
+        # Using Ticker.history is often more robust than yf.download for single tickers
+        if len(symbols) == 1:
+            try:
+                ticker = yf.Ticker(symbols[0], session=SESSION)
+                data = ticker.history(start=self.start_date, end=self.end_date)
+                if data.empty:
+                    # Fallback to download if history is empty
+                    data = yf.download(symbols[0], start=self.start_date, end=self.end_date, progress=False, session=SESSION)
+                return data
+            except Exception as e:
+                print(f"Error with Ticker.history for {symbols[0]}: {e}")
+                return yf.download(symbols, start=self.start_date, end=self.end_date, progress=False, session=SESSION)
+        
+        # For multiple symbols, use download with progress=False
+        return yf.download(symbols, start=self.start_date, end=self.end_date, progress=False, session=SESSION)
 
     def fetch_macro_data(self, indicators=None):
         """Fetch macroeconomic data from FRED."""
