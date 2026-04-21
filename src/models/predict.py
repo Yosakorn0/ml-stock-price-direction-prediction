@@ -57,7 +57,8 @@ class Predictor:
                 "latest_price": latest_row['Close'],
                 "sentiment": latest_row.get('Sentiment', 0),
                 "rsi": latest_row.get('RSI', 0),
-                "timestamp": latest_df.index[-1].strftime("%Y-%m-%d")
+                "timestamp": latest_df.index[-1].strftime("%Y-%m-%d"),
+                "is_cached": latest_df.attrs.get('is_cached', False)
             }
         except DataFetchError as e:
             return {"error": f"Market Data: {str(e)}"}

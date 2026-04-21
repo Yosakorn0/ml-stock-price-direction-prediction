@@ -159,6 +159,7 @@ class DataIngestion:
             try:
                 fh_data = self.fetch_finnhub_data(symbols[0])
                 if not fh_data.empty and fh_data['Close'].dropna().shape[0] >= 2:
+                    self._save_evergreen(symbols[0], fh_data)
                     return fh_data
             except Exception as e:
                 print(f"Strategy 0 failed: {e}")
@@ -168,6 +169,7 @@ class DataIngestion:
             try:
                 av_data = self.fetch_alpha_vantage_data(symbols[0])
                 if not av_data.empty and av_data['Close'].dropna().shape[0] >= 2:
+                    self._save_evergreen(symbols[0], av_data)
                     return av_data
             except Exception as e:
                 print(f"Strategy 1 failed: {e}")
@@ -181,6 +183,7 @@ class DataIngestion:
                 ticker = yf.Ticker(s)
                 data = ticker.history(period="1y", interval="1d", auto_adjust=True)
                 if not data.empty and data['Close'].dropna().shape[0] >= 2:
+                    self._save_evergreen(s, data)
                     return data
             except Exception as e:
                 print(f"Strategy A failed: {e}")
@@ -194,8 +197,10 @@ class DataIngestion:
             if not data.empty:
                 # Basic check for at least 2 rows of data
                 if isinstance(data.columns, pd.MultiIndex):
+                    self._save_evergreen(symbols, data)
                     return data
                 elif data['Close'].dropna().shape[0] >= 2:
+                    self._save_evergreen(symbols, data)
                     return data
         except Exception as e:
             print(f"Strategy B failed: {e}")
@@ -242,10 +247,52 @@ class DataIngestion:
             print(f"Strategy E: yf.download (5-Day Pulse) for {symbols}")
             data = yf.download(symbols, period="5d", interval="1d", progress=False)
             if not data.empty and (isinstance(data.columns, pd.MultiIndex) or data['Close'].dropna().shape[0] >= 2):
+                self._save_evergreen(symbols, data)
                 return data
         except Exception as e:
-            print(f"Strategy E failed: {e}")
+            self.last_status.append(f"Strategy E failed: {e}")
 
+        # Strategy F: Evergreen Cache (The Presentation Saver)
+        print(f"Strategy F: Attempting Evergreen Cache for {symbols}")
+        cached_data = self._load_evergreen(symbols)
+        if not cached_data.empty:
+            self.last_status.append(f"Strategy F (Evergreen): SUCCESS (Loaded from cache)")
+            return cached_data
+
+        return pd.DataFrame()
+
+    def _save_evergreen(self, symbols, data):
+        """Save a snapshot of successful data to be used during outages."""
+        try:
+            cache_dir = "data/raw/evergreen"
+            os.makedirs(cache_dir, exist_ok=True)
+            
+            # If multi-index, we save per-asset
+            if isinstance(data.columns, pd.MultiIndex):
+                for symbol in (symbols if isinstance(symbols, list) else [symbols]):
+                    asset_df = data.xs(symbol, axis=1, level=1) if symbol in data.columns.get_level_values(1) else data
+                    asset_df.to_csv(f"{cache_dir}/{symbol.replace('=F', '_GOLD').replace('-USD', '_BTC')}.csv")
+            else:
+                symbol = symbols[0] if isinstance(symbols, list) else symbols
+                data.to_csv(f"{cache_dir}/{symbol.replace('=F', '_GOLD').replace('-USD', '_BTC')}.csv")
+        except Exception as e:
+            print(f"Failed to save evergreen cache: {e}")
+
+    def _load_evergreen(self, symbols):
+        """Load data from the evergreen cache."""
+        try:
+            cache_dir = "data/raw/evergreen"
+            symbol = symbols[0] if isinstance(symbols, list) else symbols
+            clean_symbol = symbol.replace('=F', '_GOLD').replace('-USD', '_BTC')
+            cache_path = f"{cache_dir}/{clean_symbol}.csv"
+            
+            if os.path.exists(cache_path):
+                df = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+                # Flag this data as cached for the UI
+                df.attrs['is_cached'] = True
+                return df
+        except Exception as e:
+            print(f"Failed to load evergreen cache: {e}")
         return pd.DataFrame()
 
     def fetch_macro_data(self, indicators=None):

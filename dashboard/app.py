@@ -215,6 +215,10 @@ if st.button("Generate Intelligence Report", use_container_width=True):
                 PREDICTION_COUNT.labels(symbol=selected_symbol, prediction=result['prediction']).inc()
                 SENTIMENT_VAL.labels(symbol=selected_symbol).set(result['sentiment'])
                 
+                # Notification for Cached Data
+                if result.get('is_cached'):
+                    st.info("⚠️ **Showing Offline Cache:** API Latency detected. Results are based on the latest available local snapshot.")
+                
                 # Top Metrics
                 m1, m2, m3, m4 = st.columns(4)
                 

@@ -54,7 +54,12 @@ class Preprocessor:
             df = df.join(macro_daily, how='left')
             df = df.fillna(method='ffill')
             
-        return df.dropna()
+        final_df = df.dropna()
+        # Preserve the is_cached attribute from market_data if it exists
+        if hasattr(market_data, 'attrs') and market_data.attrs.get('is_cached'):
+            final_df.attrs['is_cached'] = True
+            
+        return final_df
 
     def prepare_all_data(self):
         """Prepare data for all symbols and save."""
