@@ -46,6 +46,13 @@ ENV/
 *.model
 
 # =========================
+# Infrastructure & Monitoring Data
+# =========================
+infrastructure/grafana/data/
+infrastructure/prometheus/data/
+infrastructure/prometheus/data_old/
+
+# =========================
 # OS Files
 # =========================
 .DS_Store
