@@ -26,6 +26,10 @@ class Preprocessor:
         if market_data.empty or market_data['Close'].dropna().shape[0] < 2:
             raise DataFetchError(f"Insufficient market data for {symbol} (need at least 2 days of valid prices).")
             
+        # Ensure TZ-Naive (Essential for Joining with Sentiment/Macro)
+        if hasattr(market_data.index, 'tz') and market_data.index.tz is not None:
+            market_data.index = market_data.index.tz_localize(None)
+            
         # Handle MultiIndex if necessary
         if isinstance(market_data.columns, pd.MultiIndex):
             market_data.columns = market_data.columns.get_level_values(0)

@@ -140,7 +140,7 @@ class DataIngestion:
                 return pd.DataFrame()
 
             df = df.astype(float)
-            df.index = pd.to_datetime(df.index)
+            df.index = pd.to_datetime(df.index).tz_localize(None)
             df = df.sort_index()
             self.last_status.append(f"Strategy 1 (AlphaVantage): SUCCESS ({len(df)} rows)")
             return df
@@ -183,6 +183,7 @@ class DataIngestion:
                 ticker = yf.Ticker(s)
                 data = ticker.history(period="1y", interval="1d", auto_adjust=True)
                 if not data.empty and data['Close'].dropna().shape[0] >= 2:
+                    data.index = data.index.tz_localize(None)
                     self._save_evergreen(s, data)
                     return data
             except Exception as e:
@@ -195,6 +196,9 @@ class DataIngestion:
             print(f"Strategy B: yf.download for {symbols}")
             data = yf.download(symbols, period="1y", interval="1d", progress=False)
             if not data.empty:
+                # Standardize index to be TZ-Naive
+                data.index = data.index.tz_localize(None)
+                
                 # Basic check for at least 2 rows of data
                 if isinstance(data.columns, pd.MultiIndex):
                     self._save_evergreen(symbols, data)
@@ -247,6 +251,7 @@ class DataIngestion:
             print(f"Strategy E: yf.download (5-Day Pulse) for {symbols}")
             data = yf.download(symbols, period="5d", interval="1d", progress=False)
             if not data.empty and (isinstance(data.columns, pd.MultiIndex) or data['Close'].dropna().shape[0] >= 2):
+                data.index = data.index.tz_localize(None)
                 self._save_evergreen(symbols, data)
                 return data
         except Exception as e:
@@ -288,6 +293,8 @@ class DataIngestion:
             
             if os.path.exists(cache_path):
                 df = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+                # Ensure TZ-Naive even when loading from old cache
+                df.index = pd.to_datetime(df.index).tz_localize(None)
                 # Flag this data as cached for the UI
                 df.attrs['is_cached'] = True
                 return df
