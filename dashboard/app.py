@@ -1,4 +1,13 @@
 import streamlit as st
+import logging
+import warnings
+import transformers
+
+# Mute noisy transformers/torch/huggingface warnings
+logging.getLogger("transformers").setLevel(logging.ERROR)
+logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
+warnings.filterwarnings("ignore", category=UserWarning, module="torch")
+warnings.filterwarnings("ignore", message="Accessing __path__")
 
 # Page configuration - MUST BE FIRST STREAMLIT COMMAND
 st.set_page_config(
@@ -22,14 +31,15 @@ import time
 from prometheus_client import start_http_server, Counter, Histogram, Gauge
 
 # --- PROMETHEUS METRICS ---
-# Initialize metrics once using Streamlit's cache_resource
+# Initialize metrics once. Port 8000 is used for scraping.
+try:
+    start_http_server(8000, addr='0.0.0.0')
+    logging.info("PROMETHEUS: Metrics server started on port 8000")
+except Exception as e:
+    logging.warning(f"PROMETHEUS: Metrics server already running or failed: {e}")
+
 @st.cache_resource
 def get_metrics():
-    try:
-        start_http_server(8000, addr='0.0.0.0')
-    except Exception:
-        pass # Server already running
-        
     return {
         'count': Counter('vortex_predictions', 'Total number of stock predictions made', ['symbol', 'prediction']),
         'latency': Histogram('vortex_inference_latency', 'Time spent processing model inference'),
@@ -176,17 +186,17 @@ with st.sidebar:
         else:
             st.write("Initializing console...")
 
-    performance_data = {
-        "Asset": ["Gold", "MSFT", "GOOGL", "AMZN", "BTC"],
-        "Sharpe": [1.49, -0.26, -0.01, -0.71, -0.78]
-    }
-    perf_df = pd.DataFrame(performance_data)
-    
-    def highlight_sharpe(val):
-        color = '#00f2fe' if val > 0 else '#ff4b4b'
-        return f'color: {color}; font-weight: bold'
+    # performance_data = {
+    #     "Asset": ["Gold", "MSFT", "GOOGL", "AMZN", "BTC"],
+    #     "Sharpe": [1.49, -0.26, -0.01, -0.71, -0.78]
+    # }
+    # perf_df = pd.DataFrame(performance_data)
+        
+    # def highlight_sharpe(val):
+    #     color = '#00f2fe' if val > 0 else '#ff4b4b'
+    #     return f'color: {color}; font-weight: bold'
 
-    st.table(perf_df.style.map(highlight_sharpe, subset=['Sharpe']))
+    # st.table(perf_df.style.map(highlight_sharpe, subset=['Sharpe']))
     
     st.info("Core Engine: FinBERT + XGBoost Ensemble")
 

@@ -20,9 +20,10 @@ services:
   prometheus:
     image: prom/prometheus:latest
     ports:
-      - "9090:9090"
+      - "9030:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
     networks:
       - monitoring
 
@@ -46,6 +47,7 @@ services:
     volumes:
       - ./infrastructure/grafana/provisioning:/etc/grafana/provisioning
       - ./infrastructure/grafana/dashboards:/var/lib/grafana/dashboards
+      - grafana_data:/var/lib/grafana
     depends_on:
       - prometheus
     networks:
@@ -54,3 +56,7 @@ services:
 networks:
   monitoring:
     driver: bridge
+
+volumes:
+  prometheus_data:
+  grafana_data:
