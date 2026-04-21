@@ -27,8 +27,16 @@ class Preprocessor:
             raise DataFetchError(f"Insufficient market data for {symbol} (need at least 2 days of valid prices).")
             
         # Ensure TZ-Naive (Essential for Joining with Sentiment/Macro)
-        if hasattr(market_data.index, 'tz') and market_data.index.tz is not None:
-            market_data.index = market_data.index.tz_localize(None)
+        try:
+            if hasattr(market_data.index, 'tz') and market_data.index.tz is not None:
+                market_data.index = market_data.index.tz_localize(None)
+            else:
+                # Double-check conversion if it's a string index or weird format
+                market_data.index = pd.to_datetime(market_data.index)
+                if hasattr(market_data.index, 'tz') and market_data.index.tz is not None:
+                    market_data.index = market_data.index.tz_localize(None)
+        except Exception as e:
+            print(f"Warning: Timezone standardization bypassed for {symbol}: {e}")
             
         # Handle MultiIndex if necessary
         if isinstance(market_data.columns, pd.MultiIndex):
