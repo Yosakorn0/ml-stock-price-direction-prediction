@@ -54,11 +54,22 @@ class Preprocessor:
         # 5. Optional Macro Data (Feature Consistency)
         if include_macro:
             macro_data = self.ingestor.fetch_macro_data()
-            macro_daily = macro_data.resample('D').ffill()
-            df = df.join(macro_daily, how='left')
-            df = df.fillna(method='ffill')
+            if not macro_data.empty:
+                macro_daily = macro_data.resample('D').ffill()
+                df = df.join(macro_daily, how='left')
+                # Forward fill any gaps in macro data, then fill remaining with median or 0
+                df = df.ffill().fillna(0)
+            else:
+                print(f"Warning: Macro data fetch failed for {symbol}. Continuing without macro features.")
             
-        final_df = df.dropna()
+        # Final cleanup: ONLY drop if core market price data is missing
+        # We allow sentiment/macro to be 0/filled if missing, but we MUST have 'Close'
+        final_df = df.dropna(subset=['Close'])
+        
+        # Ensure we still have Target for training mode
+        if 'Target' in final_df.columns:
+            final_df = final_df.dropna(subset=['Target'])
+
         # Preserve the is_cached attribute from market_data if it exists
         if hasattr(market_data, 'attrs') and market_data.attrs.get('is_cached'):
             final_df.attrs['is_cached'] = True
