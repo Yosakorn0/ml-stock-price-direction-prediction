@@ -18,6 +18,9 @@ USER_AGENTS = [
 ]
 
 def get_session():
+    # Note: Modern yfinance often prefers its own session management 
+    # or curl_cffi for bypassing anti-bot measures.
+    import requests
     session = requests.Session()
     session.headers.update({'User-Agent': random.choice(USER_AGENTS)})
     return session
@@ -103,27 +106,44 @@ class DataIngestion:
                 self.last_status.append("Strategy 1 (AlphaVantage): SKIP (No Key)")
                 return pd.DataFrame()
             
-            # Map symbol for Alpha Vantage
-            av_symbol = symbol.replace("-USD", "")
-            if symbol == "GC=F":
-                av_symbol = "GLD" # Use Gold ETF as Alpha Vantage futures mapping is volatile
+            # Specific Handling for Crypto vs Stocks
+            is_crypto = "-USD" in symbol or symbol == "BTC"
+            if is_crypto:
+                av_symbol = symbol.replace("-USD", "")
+                url = f'https://www.alphavantage.co/query?function=DIGITAL_CURRENCY_DAILY&symbol={av_symbol}&market=USD&apikey={av_key}'
+            else:
+                if symbol == "GC=F":
+                    # Skip AV for Gold Futures as it often returns incorrect mappings
+                    self.last_status.append("Strategy 1 (AlphaVantage): SKIP (Inconsistent Gold Mapping)")
+                    return pd.DataFrame()
                 
-            url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={av_symbol}&apikey={av_key}&outputsize=compact'
+                av_symbol = symbol
+                url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={av_symbol}&apikey={av_key}&outputsize=compact'
+                
             r = requests.get(url, timeout=10)
             data = r.json()
             
-            if "Time Series (Daily)" in data:
+            # Parse Based on Endpoint
+            if is_crypto and "Time Series (Digital Currency Daily)" in data:
+                ts_data = data["Time Series (Digital Currency Daily)"]
+                df = pd.DataFrame.from_dict(ts_data, orient='index')
+                # Correct cols for AlphaVantage Crypto: '4a. close (USD)'
+                df = df[['1a. open (USD)', '2a. high (USD)', '3a. low (USD)', '4a. close (USD)', '5. volume']]
+                df.columns = ['Open', 'High', 'Low', 'Close', 'Volume']
+            elif not is_crypto and "Time Series (Daily)" in data:
                 ts_data = data["Time Series (Daily)"]
                 df = pd.DataFrame.from_dict(ts_data, orient='index')
                 df.columns = ['Open', 'High', 'Low', 'Close', 'Volume']
-                df = df.astype(float)
-                df.index = pd.to_datetime(df.index)
-                df = df.sort_index()
-                self.last_status.append(f"Strategy 1 (AlphaVantage): SUCCESS ({len(df)} rows)")
-                return df
             else:
-                note = data.get('Note', data.get('Information', 'Unknown Error'))
+                note = data.get('Note', data.get('Error Message', data.get('Information', 'Unknown Error')))
                 self.last_status.append(f"Strategy 1 (AlphaVantage): FAILED msg={note[:50]}")
+                return pd.DataFrame()
+
+            df = df.astype(float)
+            df.index = pd.to_datetime(df.index)
+            df = df.sort_index()
+            self.last_status.append(f"Strategy 1 (AlphaVantage): SUCCESS ({len(df)} rows)")
+            return df
         except Exception as e:
             self.last_status.append(f"Strategy 1 (AlphaVantage): ERROR {str(e)}")
         return pd.DataFrame()
@@ -157,8 +177,8 @@ class DataIngestion:
             try:
                 s = symbols[0]
                 print(f"Strategy A: Ticker.history (string) for {s}")
-                sess = get_session()
-                ticker = yf.Ticker(s, session=sess)
+                # Removed custom session as it conflicts with modern yf
+                ticker = yf.Ticker(s)
                 data = ticker.history(period="1y", interval="1d", auto_adjust=True)
                 if not data.empty and data['Close'].dropna().shape[0] >= 2:
                     return data
@@ -167,11 +187,10 @@ class DataIngestion:
             
             time.sleep(1) # Small delay to reset connection
 
-        # Strategy B: yf.download with randomized session
+        # Strategy B: yf.download (Standard)
         try:
-            print(f"Strategy B: yf.download (random session) for {symbols}")
-            sess = get_session()
-            data = yf.download(symbols, period="1y", interval="1d", progress=False, session=sess)
+            print(f"Strategy B: yf.download for {symbols}")
+            data = yf.download(symbols, period="1y", interval="1d", progress=False)
             if not data.empty:
                 # Basic check for at least 2 rows of data
                 if isinstance(data.columns, pd.MultiIndex):
@@ -200,7 +219,7 @@ class DataIngestion:
             
             for s in (symbols if isinstance(symbols, list) else [symbols]):
                 # Stooq doesn't use the same suffixes as Yahoo for some assets
-                stooq_symbol = s.replace("-USD", "").replace("=F", "")
+                stooq_symbol = s.replace("-USD", "USD").replace("=F", ".F")
                 try:
                     s_data = web.DataReader(stooq_symbol, 'stooq', start='2024-01-01')
                     if not s_data.empty:

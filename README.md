@@ -154,11 +154,6 @@ If running outside of Docker, follow these steps in order:
    python scripts/analyze_scientific.py
    ```
 
-5. **Generate the report**:
-   ```bash
-   python scripts/generate_report.py
-   ```
-
 ## 🔗 Resources
 - **Sentiment Model**: [ProsusAI/finbert](https://huggingface.co/ProsusAI/finbert) on Hugging Face.
 - **Data Sources**: Yahoo Finance, FRED, Finnhub.
